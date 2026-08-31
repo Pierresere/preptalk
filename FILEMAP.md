@@ -65,6 +65,11 @@
 - `web/src/i18n/fr.json` / `web/src/i18n/en.json` — translation dictionaries (identical key sets, enforced by test)
 - `web/src/i18n/index.tsx` — `I18nProvider`, `useT`, `useLang`; lang persisted in `localStorage['preptalk.lang']`, missing key falls back to the key, `{var}` interpolation
 - `web/src/services/theme.ts` — `Theme`, `readTheme`/`resolve`/`applyTheme`/`writeTheme`/`followSystem`; storage key `preptalk.theme`
+- `web/src/types.ts` — plain TS interfaces mirroring the server domain types (`Dossier`, `Persona`, `Phase`, `Plan`, `Requirement`, `Analysis`, `Message`, `Session`), plus `ProviderInfo`, `DossierBundle`, and `SECTIONS` (the 9 research section titles, fr/en, copied verbatim from `server/src/domain/sections.ts`)
+- `web/src/services/api.ts` — `ApiError`, shared `request<T>` helper (JSON fetch, non-2xx throws `ApiError` from `body.error`, 204 → `undefined`); dossier/provider/session CRUD functions and `sendTurn` (returns the raw streaming `Response`)
+- `web/src/services/sse.ts` — `readSse(response, handlers)`: reads the SSE body via `getReader()`/`TextDecoder`, splits events on blank lines, parses `event:`/`data:` lines, dispatches `stage`/`sources`/`chunk`/`done`/`error` handlers, ignoring unknown events
+- `web/test/api.test.ts` — tests for `request`/`createDossier`/`listDossiers` (JSON POST, `ApiError` status/message from string and object `error`, 204 → `undefined`) with `fetch` mocked via `vi.stubGlobal`
+- `web/test/sse.test.ts` — tests for `readSse` (stage/chunk/done dispatch order, unknown event ignored, `data:` with no leading space, error handler)
 - `web/src/components/ThemeSwitch.tsx` — cycles auto→light→dark
 - `web/src/components/LangSwitch.tsx` — toggles fr/en
 - `FILEMAP.md` — this file
