@@ -15,13 +15,15 @@
 - `server/src/domain/retrieval.ts` — lexical retrieval: `Chunk`, `ChunkHit`, `tokenize`, `selectChunks` with accent folding and bilingual stop words
 - `server/src/providers/types.ts` — `Provider` interface, `StreamInput`/`StructuredInput`/`SearchInput`/`SearchResult`, `ProviderMap`, `ProviderError`
 - `server/src/providers/fake.ts` — `FakeProvider`: scripted test double implementing `Provider`, records calls
-- `server/src/providers/registry.ts` — `createProviders(config)`: builds the `ProviderMap`, registers Anthropic/OpenAI when their config keys are set
+- `server/src/providers/registry.ts` — `createProviders(config)`: builds the `ProviderMap`, registers Anthropic/OpenAI/Gemini when their config keys are set
 - `server/src/providers/anthropic.ts` — `createAnthropicProvider(apiKey)`: Anthropic `Provider` adapter (stream/structured/search via `@anthropic-ai/sdk`), exported pure helper `extractSearch`
 - `server/src/providers/openai.ts` — `createOpenAiProvider(apiKey)`: OpenAI `Provider` adapter (stream/structured/search via `openai` Responses API), exported pure helper `extractCitations`
+- `server/src/providers/gemini.ts` — `createGeminiProvider(apiKey)`: Gemini `Provider` adapter (stream/structured/search via `@google/genai`), exported pure helper `extractGrounding`
 - `server/test/app.test.ts` — tests for `createApp` health endpoint and `readConfig` defaults
 - `server/test/providers/fake.test.ts` — tests for `FakeProvider` streaming and structured output validation
 - `server/test/providers/anthropic.test.ts` — unit test for `extractSearch` (no network)
 - `server/test/providers/openai.test.ts` — unit test for `extractCitations` (no network)
+- `server/test/providers/gemini.test.ts` — unit test for `extractGrounding` (no network)
 - `server/test/domain/types.test.ts` — tests for zod schemas and skeleton structure
 - `server/test/domain/phases.test.ts` — tests for phase engine functions
 - `server/test/domain/retrieval.test.ts` — tests for tokenization, accent folding, stop words, and chunk ranking
