@@ -7,8 +7,10 @@
 - `server/vitest.config.ts` — vitest test runner config for server
 - `server/.env.example` — template for server environment variables (API keys, data dir, port)
 - `server/src/config.ts` — `readConfig`: parses `Config` from `process.env`
-- `server/src/app.ts` — `createApp`: builds the Hono app, exposes `/api/health`
-- `server/src/index.ts` — server entry point: reads config, creates app, serves static web build, listens
+- `server/src/app.ts` — `createApp`/`AppDeps`: builds the Hono app, mounts `/api/health`, providers and dossier routes, and the shared `onError` handler mapping error `status` to the HTTP response
+- `server/src/index.ts` — server entry point: reads config, builds `DossierStore`/`SessionStore` from `config.dataDir`, creates app, serves static web build, listens
+- `server/src/routes/providers.ts` — `createProvidersRoute`: `GET /api/providers` lists configured providers as `{ id, models }`
+- `server/src/routes/dossiers.ts` — `createDossiersRoute`: dossier CRUD, offer/resume/company/plan text and JSON writes, document add/remove, all zod-validated
 - `server/src/domain/types.ts` — zod schemas and TypeScript types for all domain entities (Dossier, Plan, Session, etc.)
 - `server/src/domain/skeleton.ts` — `SKELETON` constant with 7 interview phases and `LANGUAGE_SWITCH` phase, with `SkeletonPhase` interface
 - `server/src/domain/phases.ts` — phase engine: `turnFromHistory`, `totalQuestions`, `phaseForTurn`, `closedPhases`
@@ -20,6 +22,7 @@
 - `server/src/providers/openai.ts` — `createOpenAiProvider(apiKey)`: OpenAI `Provider` adapter (stream/structured/search via `openai` Responses API), exported pure helper `extractCitations`
 - `server/src/providers/gemini.ts` — `createGeminiProvider(apiKey)`: Gemini `Provider` adapter (stream/structured/search via `@google/genai`), exported pure helper `extractGrounding`
 - `server/test/app.test.ts` — tests for `createApp` health endpoint and `readConfig` defaults
+- `server/test/routes/dossiers.test.ts` — tests for dossier and provider routes (create/list/get aggregate/patch/delete, text and document writes, 400/404 error mapping)
 - `server/test/providers/fake.test.ts` — tests for `FakeProvider` streaming and structured output validation
 - `server/test/providers/anthropic.test.ts` — unit test for `extractSearch` (no network)
 - `server/test/providers/openai.test.ts` — unit test for `extractCitations` (no network)
