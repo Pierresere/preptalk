@@ -58,6 +58,7 @@
   "documents.text": "Texte",
   "documents.remove": "Retirer",
   "interview.start": "Démarrer",
+  "interview.opener": "Bonjour, je suis prêt.",
   "interview.new": "Nouvel entretien",
   "interview.stop": "Arrêter",
   "interview.placeholder": "Écrivez votre réponse…",

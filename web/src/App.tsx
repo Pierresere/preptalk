@@ -6,6 +6,7 @@ import { DossierList } from './components/DossierList'
 import { DossierForm } from './components/DossierForm'
 import { useDossiers } from './hooks/useDossiers'
 import { PrepareScreen } from './components/PrepareScreen'
+import { InterviewScreen } from './components/InterviewScreen'
 import type { CreateDossierInput } from './services/api.js'
 import type { Screen } from './screens.js'
 
@@ -53,7 +54,7 @@ function Content() {
     return <PrepareScreen id={screen.id} onInterview={() => setScreen({ name: 'interview', id: screen.id })} />
   }
   if (screen.name === 'interview') {
-    return <p>interview: {screen.id}</p>
+    return <InterviewScreen id={screen.id} />
   }
   return null
 }

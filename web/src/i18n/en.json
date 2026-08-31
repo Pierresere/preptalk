@@ -58,6 +58,7 @@
   "documents.text": "Text",
   "documents.remove": "Remove",
   "interview.start": "Start",
+  "interview.opener": "Hello, I'm ready.",
   "interview.new": "New interview",
   "interview.stop": "Stop",
   "interview.placeholder": "Write your answer…",
