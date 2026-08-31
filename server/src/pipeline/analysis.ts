@@ -35,7 +35,7 @@ export interface AnalyzeInput {
 export async function analyze(input: AnalyzeInput): Promise<Analysis> {
   const { provider, model, offer, resume, language, signal } = input
   if (offer.trim().length < MIN_LENGTH || resume.trim().length < MIN_LENGTH) {
-    throw new ProviderError('Offer or resume is empty', 400)
+    throw new ProviderError('Offer or resume is empty or too short (min 50 characters)', 400)
   }
   return provider.structured({
     system: systemPrompt(language),

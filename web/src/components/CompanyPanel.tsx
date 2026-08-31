@@ -1,4 +1,4 @@
-import { useT, useLang } from '../i18n'
+import { useT } from '../i18n'
 import { toHtml } from '../services/markdown.js'
 import { SECTIONS } from '../types.js'
 
@@ -15,13 +15,13 @@ interface Card {
   sectionId: string | null
 }
 
-function matchSectionId(title: string, lang: 'fr' | 'en'): string | null {
+function matchSectionId(title: string): string | null {
   const normalized = title.trim().toLowerCase()
   const match = SECTIONS.find((s) => s.fr.toLowerCase() === normalized || s.en.toLowerCase() === normalized)
   return match ? match.id : null
 }
 
-function splitIntoCards(company: string, lang: 'fr' | 'en'): Card[] {
+function splitIntoCards(company: string): Card[] {
   const lines = company.split('\n')
   const cards: Card[] = []
   let current: Card | null = { title: null, body: '', sectionId: null }
@@ -30,7 +30,7 @@ function splitIntoCards(company: string, lang: 'fr' | 'en'): Card[] {
     if (line.startsWith('## ')) {
       if (current) cards.push(current)
       const title = line.slice(3).trim()
-      current = { title, body: '', sectionId: matchSectionId(title, lang) }
+      current = { title, body: '', sectionId: matchSectionId(title) }
     } else if (current) {
       current.body += `${line}\n`
     }
@@ -42,7 +42,6 @@ function splitIntoCards(company: string, lang: 'fr' | 'en'): Card[] {
 
 export function CompanyPanel({ company, busy, onResearchAll, onResearchSection }: CompanyPanelProps) {
   const t = useT()
-  const [lang] = useLang()
 
   if (company.trim().length === 0) {
     return (
@@ -55,7 +54,7 @@ export function CompanyPanel({ company, busy, onResearchAll, onResearchSection }
     )
   }
 
-  const cards = splitIntoCards(company, lang)
+  const cards = splitIntoCards(company)
 
   return (
     <div className="panel">

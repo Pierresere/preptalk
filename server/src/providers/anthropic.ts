@@ -39,6 +39,8 @@ export function createAnthropicProvider(apiKey: string): Provider {
     models: MODELS,
     async *stream(input: StreamInput) {
       try {
+        // Note: `temperature` is intentionally NOT forwarded here (unlike the gemini/openai
+        // adapters) — Claude 5 models reject the `temperature` parameter on this endpoint.
         const stream = client.messages.stream(
           { model: input.model, max_tokens: 8192, system: input.system, messages: toMessages(input.messages) },
           { signal: input.signal },

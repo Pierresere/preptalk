@@ -4,7 +4,7 @@ import path from 'node:path'
 import os from 'node:os'
 import { SessionStore } from '../../src/storage/sessions.js'
 import { DossierStore } from '../../src/storage/dossiers.js'
-import { NotFoundError, CorruptFileError } from '../../src/storage/errors.js'
+import { NotFoundError, CorruptFileError, InvalidNameError } from '../../src/storage/errors.js'
 import { sessionPath } from '../../src/storage/paths.js'
 
 describe('SessionStore', () => {
@@ -94,6 +94,15 @@ describe('SessionStore', () => {
     const filePath = sessionPath(dir, dossier.id, 'broken')
     await fs.writeFile(filePath, '{ not json', 'utf-8')
     await expect(sessionStore.read(dossier.id, 'broken')).rejects.toBeInstanceOf(CorruptFileError)
+  })
+
+  test('list rejects a path-traversal dossierId', async () => {
+    await expect(sessionStore.list('../evil')).rejects.toBeInstanceOf(InvalidNameError)
+  })
+
+  test('read rejects a path-traversal sessionId', async () => {
+    const dossier = await dossierStore.create(dossierInput)
+    await expect(sessionStore.read(dossier.id, '../evil')).rejects.toBeInstanceOf(InvalidNameError)
   })
 
   test('save persists appended messages and debrief', async () => {

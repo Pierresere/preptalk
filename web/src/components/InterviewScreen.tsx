@@ -14,7 +14,7 @@ export function InterviewScreen({ id }: InterviewScreenProps) {
   const t = useT()
   const { bundle } = useDossier(id)
   const plan = bundle?.plan ?? null
-  const { session, draft, status, stage, sources, start, send, stop } = useInterview(id, plan)
+  const { session, draft, status, stage, sources, start, send, stop, newSession } = useInterview(id, plan)
 
   if (plan === null) {
     return <p>{t('plan.empty')}</p>
@@ -32,12 +32,19 @@ export function InterviewScreen({ id }: InterviewScreenProps) {
           {t('interview.new')}
         </button>
       ) : (
-        <div className="split-grid split-grid--main-first">
-          <div>
-            <MessageList messages={session.messages} draft={draft} streaming={streaming} recruiter={recruiter} />
-            <Composer disabled={streaming} streaming={streaming} onSend={(text) => void send(text)} onStop={stop} />
+        <div>
+          {!streaming && (
+            <button type="button" className="btn" onClick={newSession}>
+              {t('interview.reset')}
+            </button>
+          )}
+          <div className="split-grid split-grid--main-first">
+            <div>
+              <MessageList messages={session.messages} draft={draft} streaming={streaming} recruiter={recruiter} />
+              <Composer disabled={streaming} streaming={streaming} onSend={(text) => void send(text)} onStop={stop} />
+            </div>
+            <SourcesPanel ids={sources} />
           </div>
-          <SourcesPanel ids={sources} />
         </div>
       )}
     </div>

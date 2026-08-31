@@ -113,6 +113,11 @@ describe('dossier routes', () => {
     expect(res.status).toBe(404)
   })
 
+  it('returns 400 for a path-traversal dossier id', async () => {
+    const res = await app.request('/api/dossiers/..%2Fevil')
+    expect(res.status).toBe(400)
+  })
+
   it('patches a dossier', async () => {
     const created = await (
       await app.request('/api/dossiers', {

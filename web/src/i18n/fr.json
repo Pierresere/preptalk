@@ -60,6 +60,7 @@
   "interview.start": "Démarrer",
   "interview.opener": "Bonjour, je suis prêt.",
   "interview.new": "Nouvel entretien",
+  "interview.reset": "Nouvelle session",
   "interview.stop": "Arrêter",
   "interview.placeholder": "Écrivez votre réponse…",
   "interview.you": "Vous",

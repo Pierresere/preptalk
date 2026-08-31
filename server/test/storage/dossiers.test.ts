@@ -99,6 +99,11 @@ describe('DossierStore', () => {
     expect(updated.position).toBe('Senior Engineer')
   })
 
+  test('read rejects a path-traversal id', async () => {
+    await expect(store.read('../evil')).rejects.toBeInstanceOf(InvalidNameError)
+    await expect(store.read('../evil')).rejects.toMatchObject({ status: 400 })
+  })
+
   test('document name ../x.md is rejected', async () => {
     const created = await store.create(input)
     await expect(store.writeDocument(created.id, '../x.md', 'x')).rejects.toBeInstanceOf(InvalidNameError)

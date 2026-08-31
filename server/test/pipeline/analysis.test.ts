@@ -33,7 +33,7 @@ describe('analyze', () => {
         language: 'en',
         signal: new AbortController().signal,
       })
-    ).rejects.toMatchObject(new ProviderError('Offer or resume is empty', 400))
+    ).rejects.toMatchObject(new ProviderError('Offer or resume is empty or too short (min 50 characters)', 400))
     expect(provider.calls).toHaveLength(0)
   })
 
@@ -49,7 +49,7 @@ describe('analyze', () => {
         language: 'en',
         signal: new AbortController().signal,
       })
-    ).rejects.toMatchObject(new ProviderError('Offer or resume is empty', 400))
+    ).rejects.toMatchObject(new ProviderError('Offer or resume is empty or too short (min 50 characters)', 400))
     expect(provider.calls).toHaveLength(0)
   })
 

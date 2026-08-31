@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 import { Dossier, Session, SessionSchema } from '../domain/types.js'
-import { NotFoundError } from './errors.js'
+import { InvalidNameError, NotFoundError } from './errors.js'
 import { readJsonFile, writeJsonFile } from './json.js'
 import { dossierDir, sessionsDir, sessionPath } from './paths.js'
 
@@ -33,7 +33,8 @@ export class SessionStore {
   private async assertDossierExists(dossierId: string): Promise<void> {
     try {
       await fs.access(dossierDir(this.dataDir, dossierId))
-    } catch {
+    } catch (error) {
+      if (error instanceof InvalidNameError) throw error
       throw new NotFoundError(dossierId)
     }
   }
