@@ -2,9 +2,11 @@ import { Hono } from 'hono'
 import type { AppDeps } from '../app.js'
 import { ProviderError } from '../providers/types.js'
 import type { ProviderId } from '../domain/types.js'
+import { AnalysisSchema } from '../domain/types.js'
 import { SECTION_IDS, type SectionId } from '../domain/sections.js'
 import { researchAll, researchSection } from '../pipeline/research.js'
 import { analyze } from '../pipeline/analysis.js'
+import { generatePlan } from '../pipeline/plan.js'
 
 function keyNameFor(providerId: ProviderId): string {
   switch (providerId) {
@@ -67,6 +69,30 @@ export function createPrepareRoute(deps: Pick<AppDeps, 'dossiers' | 'providers'>
     })
     await store.writeJson(id, 'analysis', analysis)
     return c.json(analysis)
+  })
+
+  app.post('/api/dossiers/:id/plan', async (c) => {
+    const id = c.req.param('id')
+    const dossier = await store.read(id)
+    const provider = getProvider(deps, dossier.provider)
+    const [offer, resume, company, analysis] = await Promise.all([
+      store.readText(id, 'offer'),
+      store.readText(id, 'resume'),
+      store.readText(id, 'company'),
+      store.readJson(id, 'analysis', AnalysisSchema),
+    ])
+    const plan = await generatePlan({
+      provider,
+      model: dossier.model,
+      dossier,
+      offer,
+      resume,
+      company,
+      analysis,
+      signal: c.req.raw.signal,
+    })
+    await store.writeJson(id, 'plan', plan)
+    return c.json(plan)
   })
 
   return app
