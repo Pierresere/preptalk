@@ -3,6 +3,8 @@ import { useT } from '../i18n'
 import { useDossier } from '../hooks/useDossier.js'
 import { TextPanel } from './TextPanel.js'
 import { DocumentsPanel } from './DocumentsPanel.js'
+import { CompanyPanel } from './CompanyPanel.js'
+import { AnalysisPanel } from './AnalysisPanel.js'
 
 type SubTab = 'offer' | 'resume' | 'company' | 'analysis' | 'plan' | 'documents'
 
@@ -23,6 +25,7 @@ export function PrepareScreen({ id, onInterview }: PrepareScreenProps) {
     addDocument,
     removeDocument,
     researchAll,
+    researchSection,
     runAnalysis,
     generatePlan,
   } = useDossier(id)
@@ -54,20 +57,15 @@ export function PrepareScreen({ id, onInterview }: PrepareScreenProps) {
             <TextPanel label={t('prepare.resume')} value={bundle.resume} onSave={(text) => saveText('resume', text)} busy={busy} />
           )}
           {tab === 'company' && (
-            <div className="panel">
-              <button type="button" className="btn btn-primary" disabled={busy !== null} onClick={() => void researchAll()}>
-                {t('company.researchAll')}
-              </button>
-              <pre>{bundle.company}</pre>
-            </div>
+            <CompanyPanel
+              company={bundle.company}
+              busy={busy}
+              onResearchAll={() => void researchAll()}
+              onResearchSection={(section) => void researchSection(section)}
+            />
           )}
           {tab === 'analysis' && (
-            <div className="panel">
-              <button type="button" className="btn btn-primary" disabled={busy !== null} onClick={() => void runAnalysis()}>
-                {t('analysis.run')}
-              </button>
-              <pre>{JSON.stringify(bundle.analysis, null, 2)}</pre>
-            </div>
+            <AnalysisPanel analysis={bundle.analysis} busy={busy} onRun={() => void runAnalysis()} />
           )}
           {tab === 'plan' && (
             <div className="panel">
