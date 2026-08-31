@@ -9,7 +9,10 @@
 - `server/src/config.ts` — `readConfig`: parses `Config` from `process.env`
 - `server/src/app.ts` — `createApp`: builds the Hono app, exposes `/api/health`
 - `server/src/index.ts` — server entry point: reads config, creates app, serves static web build, listens
+- `server/src/domain/types.ts` — zod schemas and TypeScript types for all domain entities (Dossier, Plan, Session, etc.)
+- `server/src/domain/skeleton.ts` — `SKELETON` constant with 7 interview phases and `LANGUAGE_SWITCH` phase, with `SkeletonPhase` interface
 - `server/test/app.test.ts` — tests for `createApp` health endpoint and `readConfig` defaults
+- `server/test/domain/types.test.ts` — tests for zod schemas and skeleton structure
 - `web/package.json` — placeholder web workspace package (UI not yet implemented)
 - `FILEMAP.md` — this file
 - `README.md` — project overview and setup instructions
