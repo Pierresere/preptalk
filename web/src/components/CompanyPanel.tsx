@@ -10,7 +10,7 @@ interface CompanyPanelProps {
 }
 
 interface Card {
-  title: string
+  title: string | null
   body: string
   sectionId: string | null
 }
@@ -24,7 +24,7 @@ function matchSectionId(title: string, lang: 'fr' | 'en'): string | null {
 function splitIntoCards(company: string, lang: 'fr' | 'en'): Card[] {
   const lines = company.split('\n')
   const cards: Card[] = []
-  let current: Card | null = null
+  let current: Card | null = { title: null, body: '', sectionId: null }
 
   for (const line of lines) {
     if (line.startsWith('## ')) {
@@ -35,7 +35,7 @@ function splitIntoCards(company: string, lang: 'fr' | 'en'): Card[] {
       current.body += `${line}\n`
     }
   }
-  if (current) cards.push(current)
+  if (current && (current.title !== null || current.body.trim().length > 0)) cards.push(current)
 
   return cards
 }
@@ -63,8 +63,8 @@ export function CompanyPanel({ company, busy, onResearchAll, onResearchSection }
         {t('company.researchAll')}
       </button>
       {cards.map((card, idx) => (
-        <div key={`${card.title}-${idx}`} style={{ marginTop: 'var(--gap)' }}>
-          <h3>{card.title}</h3>
+        <div key={`${card.title ?? 'preamble'}-${idx}`} style={{ marginTop: 'var(--gap)' }}>
+          {card.title !== null && <h3>{card.title}</h3>}
           <div dangerouslySetInnerHTML={{ __html: toHtml(card.body) }} />
           {card.sectionId && (
             <button
