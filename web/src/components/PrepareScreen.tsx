@@ -5,6 +5,7 @@ import { TextPanel } from './TextPanel.js'
 import { DocumentsPanel } from './DocumentsPanel.js'
 import { CompanyPanel } from './CompanyPanel.js'
 import { AnalysisPanel } from './AnalysisPanel.js'
+import { PlanEditor } from './PlanEditor.js'
 
 type SubTab = 'offer' | 'resume' | 'company' | 'analysis' | 'plan' | 'documents'
 
@@ -28,6 +29,7 @@ export function PrepareScreen({ id, onInterview }: PrepareScreenProps) {
     researchSection,
     runAnalysis,
     generatePlan,
+    savePlan,
   } = useDossier(id)
 
   return (
@@ -68,12 +70,12 @@ export function PrepareScreen({ id, onInterview }: PrepareScreenProps) {
             <AnalysisPanel analysis={bundle.analysis} busy={busy} onRun={() => void runAnalysis()} />
           )}
           {tab === 'plan' && (
-            <div className="panel">
-              <button type="button" className="btn btn-primary" disabled={busy !== null} onClick={() => void generatePlan()}>
-                {t('plan.generate')}
-              </button>
-              <pre>{JSON.stringify(bundle.plan, null, 2)}</pre>
-            </div>
+            <PlanEditor
+              plan={bundle.plan}
+              busy={busy}
+              onGenerate={() => void generatePlan()}
+              onSave={(plan) => void savePlan(plan)}
+            />
           )}
           {tab === 'documents' && (
             <DocumentsPanel documents={bundle.documents} onAdd={addDocument} onRemove={removeDocument} busy={busy} />
