@@ -60,8 +60,12 @@
 - `web/test/i18n.test.tsx` — tests for `I18nProvider`/`useT` (translation, missing-key fallback, interpolation) and fr/en key-set parity
 - `web/test/theme.test.ts` — tests for `applyTheme`/`readTheme`/`writeTheme`
 - `web/src/main.tsx` — React entry point, mounts `App` into `#root`
-- `web/src/App.tsx` — top bar (app name, `ThemeSwitch`, `LangSwitch`) wrapped in `I18nProvider`, plus an empty `.screen`
-- `web/src/styles.css` — CSS variable theme tokens (light/dark via `data-theme`, `prefers-color-scheme` fallback), thin scrollbars, base layout classes (`.topbar`, `.screen`, `.panel`, `.btn`, `.chip*`, `.messages`, `.bubble`, `.coaching`, `.composer`, `.phasebar`)
+- `web/src/App.tsx` — top bar (app name, `ThemeSwitch`, `LangSwitch`) wrapped in `I18nProvider`; screen state (`Screen`) starts on `dossiers`, renders `DossierList`/`DossierForm` via `useDossiers`, opens `prepare` (placeholder `<p>`) on card click
+- `web/src/screens.ts` — `Screen` union type: `{ name: 'dossiers' } | { name: 'prepare'|'interview'|'debrief'; id: string }`
+- `web/src/hooks/useDossiers.ts` — `useDossiers()`: loads dossiers + providers on mount (`Promise.all`), exposes `loading`/`error`/`create`/`remove`/`reload`
+- `web/src/components/DossierForm.tsx` — controlled create-dossier form (company, position, sites textarea → array, language, provider/model selects synced to the chosen provider); submit disabled until company+position filled; shows `error.missingKey` + env var names when `providers` is empty
+- `web/src/components/DossierList.tsx` — card grid (company, position, `updatedAt` via `toLocaleDateString`), delete button with `window.confirm(t('dossiers.confirmDelete'))`, empty state, "new dossier" button
+- `web/src/styles.css` — CSS variable theme tokens (light/dark via `data-theme`, `prefers-color-scheme` fallback), thin scrollbars, base layout classes (`.topbar`, `.screen`, `.panel`, `.btn`, `.chip*`, `.messages`, `.bubble`, `.coaching`, `.composer`, `.phasebar`, `.dossier-grid`, `.dossier-card`, `.dossier-date`)
 - `web/src/i18n/fr.json` / `web/src/i18n/en.json` — translation dictionaries (identical key sets, enforced by test)
 - `web/src/i18n/index.tsx` — `I18nProvider`, `useT`, `useLang`; lang persisted in `localStorage['preptalk.lang']`, missing key falls back to the key, `{var}` interpolation
 - `web/src/services/theme.ts` — `Theme`, `readTheme`/`resolve`/`applyTheme`/`writeTheme`/`followSystem`; storage key `preptalk.theme`
@@ -72,6 +76,7 @@
 - `web/test/sse.test.ts` — tests for `readSse` (stage/chunk/done dispatch order, unknown event ignored, `data:` with no leading space, error handler)
 - `web/src/components/ThemeSwitch.tsx` — cycles auto→light→dark
 - `web/src/components/LangSwitch.tsx` — toggles fr/en
+- `web/test/DossierForm.test.tsx` — submit disabled until company+position filled, then submits with sites split from newlines and the selected provider/model
 - `FILEMAP.md` — this file
 - `README.md` — project overview and setup instructions
 - `LICENSE` — MIT license

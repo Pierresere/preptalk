@@ -211,3 +211,21 @@ body {
   border-bottom: 1px solid var(--line);
   color: var(--muted);
 }
+
+.dossier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--gap);
+}
+
+.dossier-card {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dossier-date {
+  color: var(--muted);
+  font-size: 12px;
+}
