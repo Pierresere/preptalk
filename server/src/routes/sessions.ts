@@ -38,20 +38,20 @@ export function createSessionsRoute(deps: Pick<AppDeps, 'dossiers' | 'sessions' 
     const signal = c.req.raw.signal
 
     return streamSSE(c, async (stream) => {
+      // Fire-and-forget: the client may disconnect mid-stream, and runTurn does not
+      // await these callbacks, so a rejected write must be swallowed here to avoid
+      // an unhandled promise rejection crashing the process.
+      const send = (event: string, payload: unknown): void => {
+        void stream.writeSSE({ event, data: JSON.stringify(payload) }).catch(() => undefined)
+      }
       try {
         const session = await runTurn(
           { dossiers, sessions, providers },
           { dossierId, sessionId, userText, signal },
           {
-            onStage: async (stage) => {
-              await stream.writeSSE({ event: 'stage', data: JSON.stringify({ stage }) })
-            },
-            onSources: async (ids) => {
-              await stream.writeSSE({ event: 'sources', data: JSON.stringify({ ids }) })
-            },
-            onDelta: async (delta) => {
-              await stream.writeSSE({ event: 'chunk', data: JSON.stringify({ delta }) })
-            },
+            onStage: (stage) => send('stage', { stage }),
+            onSources: (ids) => send('sources', { ids }),
+            onDelta: (delta) => send('chunk', { delta }),
           }
         )
         await stream.writeSSE({ event: 'done', data: JSON.stringify({ session }) })
