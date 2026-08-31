@@ -49,3 +49,14 @@ export class ProviderError extends Error {
     this.name = 'ProviderError'
   }
 }
+
+export function keyNameFor(providerId: ProviderId): string {
+  switch (providerId) {
+    case 'openai':
+      return 'OPENAI_API_KEY'
+    case 'anthropic':
+      return 'ANTHROPIC_API_KEY'
+    case 'gemini':
+      return 'GEMINI_API_KEY'
+  }
+}

@@ -1,23 +1,12 @@
 import { Hono } from 'hono'
 import type { AppDeps } from '../app.js'
-import { ProviderError } from '../providers/types.js'
+import { ProviderError, keyNameFor } from '../providers/types.js'
 import type { ProviderId } from '../domain/types.js'
 import { AnalysisSchema } from '../domain/types.js'
 import { SECTION_IDS, type SectionId } from '../domain/sections.js'
 import { researchAll, researchSection } from '../pipeline/research.js'
 import { analyze } from '../pipeline/analysis.js'
 import { generatePlan } from '../pipeline/plan.js'
-
-function keyNameFor(providerId: ProviderId): string {
-  switch (providerId) {
-    case 'openai':
-      return 'OPENAI_API_KEY'
-    case 'anthropic':
-      return 'ANTHROPIC_API_KEY'
-    case 'gemini':
-      return 'GEMINI_API_KEY'
-  }
-}
 
 function isSectionId(value: string): value is SectionId {
   return (SECTION_IDS as readonly string[]).includes(value)
