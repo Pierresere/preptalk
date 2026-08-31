@@ -1,7 +1,8 @@
 import fs from 'node:fs/promises'
 import { z } from 'zod'
 import { Dossier, DossierSchema } from '../domain/types.js'
-import { NotFoundError, CorruptFileError, InvalidNameError } from './errors.js'
+import { NotFoundError, InvalidNameError } from './errors.js'
+import { readJsonFile } from './json.js'
 import {
   dossierDir,
   dossierJsonPath,
@@ -30,26 +31,6 @@ type CreateInput = {
   language: Dossier['language']
   provider: Dossier['provider']
   model: string
-}
-
-async function readJsonFile<T>(filePath: string, schema: z.ZodType<T>): Promise<T | null> {
-  let raw: string
-  try {
-    raw = await fs.readFile(filePath, 'utf-8')
-  } catch {
-    return null
-  }
-  let parsed: unknown
-  try {
-    parsed = JSON.parse(raw)
-  } catch (cause) {
-    throw new CorruptFileError(filePath, cause)
-  }
-  const result = schema.safeParse(parsed)
-  if (!result.success) {
-    throw new CorruptFileError(filePath, result.error.issues)
-  }
-  return result.data
 }
 
 function validateDocumentName(name: string): void {

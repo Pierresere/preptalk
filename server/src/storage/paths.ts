@@ -27,3 +27,7 @@ export function documentPath(dataDir: string, id: string, name: string): string 
 export function sessionsDir(dataDir: string, id: string): string {
   return path.join(dossierDir(dataDir, id), 'sessions')
 }
+
+export function sessionPath(dataDir: string, dossierId: string, sessionId: string): string {
+  return path.join(sessionsDir(dataDir, dossierId), `${sessionId}.json`)
+}

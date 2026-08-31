@@ -30,7 +30,10 @@
 - `server/src/storage/errors.ts` — `NotFoundError`, `CorruptFileError`, `InvalidNameError` storage error classes with `status` codes
 - `server/src/storage/paths.ts` — path helpers for the `data/<slug>/...` on-disk layout
 - `server/src/storage/dossiers.ts` — `slugify`, `DossierStore`: CRUD for dossiers plus text/JSON/document read-write on disk
+- `server/src/storage/json.ts` — shared `readJsonFile`/`writeJsonFile` helpers (zod-validated JSON read, pretty-printed write) used by `DossierStore` and `SessionStore`
+- `server/src/storage/sessions.ts` — `SessionStore`: create/list/read/save interview sessions under `data/<dossierId>/sessions/<id>.json`
 - `server/test/storage/dossiers.test.ts` — tests for `slugify` and `DossierStore` (slug uniqueness, text/JSON round-trip, corrupt file, documents)
+- `server/test/storage/sessions.test.ts` — tests for `SessionStore` (create/read round-trip, newest-first list, missing dossier/session, corrupt file, save persists messages/debrief)
 - `web/package.json` — placeholder web workspace package (UI not yet implemented)
 - `FILEMAP.md` — this file
 - `README.md` — project overview and setup instructions
