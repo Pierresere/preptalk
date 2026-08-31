@@ -1,7 +1,7 @@
 import { Hono, type Context } from 'hono'
 import { z } from 'zod'
 import type { AppDeps } from '../app.js'
-import { PlanSchema, LanguageSchema, ProviderIdSchema } from '../domain/types.js'
+import { AnalysisSchema, PlanSchema, LanguageSchema, ProviderIdSchema } from '../domain/types.js'
 
 const CreateDossierSchema = z.object({
   company: z.string().min(1),
@@ -43,7 +43,7 @@ export function createDossiersRoute(deps: Pick<AppDeps, 'dossiers'>): Hono {
       store.readText(id, 'resume'),
       store.readText(id, 'company'),
       store.listDocuments(id),
-      store.readJson(id, 'analysis', z.unknown()),
+      store.readJson(id, 'analysis', AnalysisSchema),
       store.readJson(id, 'plan', PlanSchema),
     ])
     return c.json({ dossier, offer, resume, company, documents, analysis, plan })
