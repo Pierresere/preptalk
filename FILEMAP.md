@@ -55,3 +55,5 @@
 - `web/package.json` — placeholder web workspace package (UI not yet implemented)
 - `FILEMAP.md` — this file
 - `README.md` — project overview and setup instructions
+- `LICENSE` — MIT license
+- `CONTRIBUTING.md` — contribution guidelines: tests, size limits, coding standards
