@@ -11,10 +11,13 @@
 - `server/src/index.ts` — server entry point: reads config, builds `DossierStore`/`SessionStore` from `config.dataDir`, creates app, serves static web build, listens
 - `server/src/routes/providers.ts` — `createProvidersRoute`: `GET /api/providers` lists configured providers as `{ id, models }`
 - `server/src/routes/dossiers.ts` — `createDossiersRoute`: dossier CRUD, offer/resume/company/plan text and JSON writes, document add/remove, all zod-validated
+- `server/src/routes/prepare.ts` — `createPrepareRoute`: `POST /api/dossiers/:id/company/research(/:section)`, resolves the dossier's provider (400 `Missing key: ...` when absent via local `keyNameFor`), runs `researchAll`/`researchSection`, persists `company.md`
 - `server/src/domain/types.ts` — zod schemas and TypeScript types for all domain entities (Dossier, Plan, Session, etc.)
 - `server/src/domain/skeleton.ts` — `SKELETON` constant with 7 interview phases and `LANGUAGE_SWITCH` phase, with `SkeletonPhase` interface
 - `server/src/domain/phases.ts` — phase engine: `turnFromHistory`, `totalQuestions`, `phaseForTurn`, `closedPhases`
 - `server/src/domain/retrieval.ts` — lexical retrieval: `Chunk`, `ChunkHit`, `tokenize`, `selectChunks` with accent folding and bilingual stop words
+- `server/src/domain/sections.ts` — `SECTION_IDS`/`SectionId`/`SECTION_TITLES` (fr/en) for the company research pipeline, `notFoundSentence(language)`, `buildQuery(section, dossier, knownSector, language)` builds the provider search instruction
+- `server/src/pipeline/research.ts` — company research pipeline: `parseCompany`/`renderCompany` (Markdown `## Title` sections round-trip), `researchSection`/`researchAll` call `Provider.search`, append `Sources :`/`Sources:` lines, fall back to the not-found sentence on blank results
 - `server/src/providers/types.ts` — `Provider` interface, `StreamInput`/`StructuredInput`/`SearchInput`/`SearchResult`, `ProviderMap`, `ProviderError`
 - `server/src/providers/fake.ts` — `FakeProvider`: scripted test double implementing `Provider`, records calls
 - `server/src/providers/registry.ts` — `createProviders(config)`: builds the `ProviderMap`, registers Anthropic/OpenAI/Gemini when their config keys are set
@@ -23,6 +26,9 @@
 - `server/src/providers/gemini.ts` — `createGeminiProvider(apiKey)`: Gemini `Provider` adapter (stream/structured/search via `@google/genai`), exported pure helper `extractGrounding`
 - `server/test/app.test.ts` — tests for `createApp` health endpoint and `readConfig` defaults
 - `server/test/routes/dossiers.test.ts` — tests for dossier and provider routes (create/list/get aggregate/patch/delete, text and document writes, 400/404 error mapping)
+- `server/test/routes/prepare.test.ts` — tests for `POST /api/dossiers/:id/company/research(/:section)` (200 + persisted `company.md`, 400 on unknown section)
+- `server/test/domain/sections.test.ts` — tests for `notFoundSentence` and `buildQuery` (company name, sites, known sector, not-found sentence)
+- `server/test/pipeline/research.test.ts` — tests for `parseCompany`/`renderCompany` round-trip, `researchSection` (updates one section, appends sources, not-found fallback), `researchAll` (sequential, calls `onSection`)
 - `server/test/providers/fake.test.ts` — tests for `FakeProvider` streaming and structured output validation
 - `server/test/providers/anthropic.test.ts` — unit test for `extractSearch` (no network)
 - `server/test/providers/openai.test.ts` — unit test for `extractCitations` (no network)

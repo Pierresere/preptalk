@@ -1,0 +1,55 @@
+import { Hono } from 'hono'
+import type { AppDeps } from '../app.js'
+import { ProviderError } from '../providers/types.js'
+import type { ProviderId } from '../domain/types.js'
+import { SECTION_IDS, type SectionId } from '../domain/sections.js'
+import { researchAll, researchSection } from '../pipeline/research.js'
+
+function keyNameFor(providerId: ProviderId): string {
+  switch (providerId) {
+    case 'openai':
+      return 'OPENAI_API_KEY'
+    case 'anthropic':
+      return 'ANTHROPIC_API_KEY'
+    case 'gemini':
+      return 'GEMINI_API_KEY'
+  }
+}
+
+function isSectionId(value: string): value is SectionId {
+  return (SECTION_IDS as readonly string[]).includes(value)
+}
+
+function getProvider(deps: Pick<AppDeps, 'providers'>, providerId: ProviderId) {
+  const provider = deps.providers.get(providerId)
+  if (!provider) throw new ProviderError(`Missing key: ${keyNameFor(providerId)}`, 400)
+  return provider
+}
+
+export function createPrepareRoute(deps: Pick<AppDeps, 'dossiers' | 'providers'>): Hono {
+  const app = new Hono()
+  const store = deps.dossiers
+
+  app.post('/api/dossiers/:id/company/research', async (c) => {
+    const id = c.req.param('id')
+    const dossier = await store.read(id)
+    const provider = getProvider(deps, dossier.provider)
+    const company = await researchAll(provider, dossier, () => {}, c.req.raw.signal)
+    await store.writeText(id, 'company', company)
+    return c.json({ company })
+  })
+
+  app.post('/api/dossiers/:id/company/research/:section', async (c) => {
+    const section = c.req.param('section')
+    if (!isSectionId(section)) return c.json({ error: `Unknown section: ${section}` }, 400)
+    const id = c.req.param('id')
+    const dossier = await store.read(id)
+    const provider = getProvider(deps, dossier.provider)
+    const current = await store.readText(id, 'company')
+    const company = await researchSection(provider, dossier, section, current, c.req.raw.signal)
+    await store.writeText(id, 'company', company)
+    return c.json({ company })
+  })
+
+  return app
+}
