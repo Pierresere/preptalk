@@ -12,9 +12,11 @@
 - `server/src/domain/types.ts` — zod schemas and TypeScript types for all domain entities (Dossier, Plan, Session, etc.)
 - `server/src/domain/skeleton.ts` — `SKELETON` constant with 7 interview phases and `LANGUAGE_SWITCH` phase, with `SkeletonPhase` interface
 - `server/src/domain/phases.ts` — phase engine: `turnFromHistory`, `totalQuestions`, `phaseForTurn`, `closedPhases`
+- `server/src/domain/retrieval.ts` — lexical retrieval: `Chunk`, `ChunkHit`, `tokenize`, `selectChunks` with accent folding and bilingual stop words
 - `server/test/app.test.ts` — tests for `createApp` health endpoint and `readConfig` defaults
 - `server/test/domain/types.test.ts` — tests for zod schemas and skeleton structure
 - `server/test/domain/phases.test.ts` — tests for phase engine functions
+- `server/test/domain/retrieval.test.ts` — tests for tokenization, accent folding, stop words, and chunk ranking
 - `web/package.json` — placeholder web workspace package (UI not yet implemented)
 - `FILEMAP.md` — this file
 - `README.md` — project overview and setup instructions
