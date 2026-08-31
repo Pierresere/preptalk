@@ -16,6 +16,7 @@
 - `server/src/domain/skeleton.ts` — `SKELETON` constant with 7 interview phases and `LANGUAGE_SWITCH` phase, with `SkeletonPhase` interface
 - `server/src/domain/phases.ts` — phase engine: `turnFromHistory`, `totalQuestions`, `phaseForTurn`, `closedPhases`
 - `server/src/domain/retrieval.ts` — lexical retrieval: `Chunk`, `ChunkHit`, `tokenize`, `selectChunks` with accent folding and bilingual stop words
+- `server/src/domain/prompt.ts` — `buildInterviewSystem({ plan, turn, chunks, language, company, position, candidate })`: persona/conduct/coaching/honesty blocks, `<current-phase>` (or `<debrief>` once the plan is exhausted), and `<sources>` from `ChunkHit`s
 - `server/src/domain/sections.ts` — `SECTION_IDS`/`SectionId`/`SECTION_TITLES` (fr/en) for the company research pipeline, `notFoundSentence(language)`, `buildQuery(section, dossier, knownSector, language)` builds the provider search instruction
 - `server/src/pipeline/research.ts` — company research pipeline: `parseCompany`/`renderCompany` (Markdown `## Title` sections round-trip), `researchSection`/`researchAll` call `Provider.search`, append `Sources :`/`Sources:` lines, fall back to the not-found sentence on blank results
 - `server/src/pipeline/analysis.ts` — `analyze({ provider, model, offer, resume, language, signal }): Promise<Analysis>`: throws `ProviderError('Offer or resume is empty', 400)` when offer or resume trimmed length < 50 (before any provider call), otherwise calls `Provider.structured` with `AnalysisSchema` and an offer/resume prompt wrapped in `<offer>`/`<resume>` tags
