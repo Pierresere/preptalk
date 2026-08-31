@@ -13,7 +13,11 @@
 - `server/src/domain/skeleton.ts` — `SKELETON` constant with 7 interview phases and `LANGUAGE_SWITCH` phase, with `SkeletonPhase` interface
 - `server/src/domain/phases.ts` — phase engine: `turnFromHistory`, `totalQuestions`, `phaseForTurn`, `closedPhases`
 - `server/src/domain/retrieval.ts` — lexical retrieval: `Chunk`, `ChunkHit`, `tokenize`, `selectChunks` with accent folding and bilingual stop words
+- `server/src/providers/types.ts` — `Provider` interface, `StreamInput`/`StructuredInput`/`SearchInput`/`SearchResult`, `ProviderMap`, `ProviderError`
+- `server/src/providers/fake.ts` — `FakeProvider`: scripted test double implementing `Provider`, records calls
+- `server/src/providers/registry.ts` — `createProviders(config)`: builds the `ProviderMap` (empty for now, real adapters added in later tasks)
 - `server/test/app.test.ts` — tests for `createApp` health endpoint and `readConfig` defaults
+- `server/test/providers/fake.test.ts` — tests for `FakeProvider` streaming and structured output validation
 - `server/test/domain/types.test.ts` — tests for zod schemas and skeleton structure
 - `server/test/domain/phases.test.ts` — tests for phase engine functions
 - `server/test/domain/retrieval.test.ts` — tests for tokenization, accent folding, stop words, and chunk ranking

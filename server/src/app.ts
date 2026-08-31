@@ -1,9 +1,10 @@
 import { Hono } from 'hono'
 import type { Config } from './config.js'
+import type { ProviderMap } from './providers/types.js'
 
 export interface AppDeps {
   readonly config: Config
-  readonly providers: ReadonlyMap<string, unknown>
+  readonly providers: ProviderMap
 }
 
 export function createApp(deps: AppDeps): Hono {
