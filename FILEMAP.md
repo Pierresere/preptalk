@@ -27,6 +27,10 @@
 - `server/test/domain/types.test.ts` — tests for zod schemas and skeleton structure
 - `server/test/domain/phases.test.ts` — tests for phase engine functions
 - `server/test/domain/retrieval.test.ts` — tests for tokenization, accent folding, stop words, and chunk ranking
+- `server/src/storage/errors.ts` — `NotFoundError`, `CorruptFileError`, `InvalidNameError` storage error classes with `status` codes
+- `server/src/storage/paths.ts` — path helpers for the `data/<slug>/...` on-disk layout
+- `server/src/storage/dossiers.ts` — `slugify`, `DossierStore`: CRUD for dossiers plus text/JSON/document read-write on disk
+- `server/test/storage/dossiers.test.ts` — tests for `slugify` and `DossierStore` (slug uniqueness, text/JSON round-trip, corrupt file, documents)
 - `web/package.json` — placeholder web workspace package (UI not yet implemented)
 - `FILEMAP.md` — this file
 - `README.md` — project overview and setup instructions
