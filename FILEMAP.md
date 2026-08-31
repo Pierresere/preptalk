@@ -7,11 +7,12 @@
 - `server/vitest.config.ts` — vitest test runner config for server
 - `server/.env.example` — template for server environment variables (API keys, data dir, port)
 - `server/src/config.ts` — `readConfig`: parses `Config` from `process.env`
-- `server/src/app.ts` — `createApp`/`AppDeps`: builds the Hono app, mounts `/api/health`, providers and dossier routes, and the shared `onError` handler mapping error `status` to the HTTP response
+- `server/src/app.ts` — `createApp`/`AppDeps`: builds the Hono app, mounts `/api/health`, providers, dossier, prepare and session routes, and the shared `onError` handler mapping error `status` to the HTTP response
 - `server/src/index.ts` — server entry point: reads config, builds `DossierStore`/`SessionStore` from `config.dataDir`, creates app, serves static web build, listens
 - `server/src/routes/providers.ts` — `createProvidersRoute`: `GET /api/providers` lists configured providers as `{ id, models }`
 - `server/src/routes/dossiers.ts` — `createDossiersRoute`: dossier CRUD, offer/resume/company/plan text and JSON writes, document add/remove, all zod-validated; the aggregate `GET /api/dossiers/:id` validates `analysis` with `AnalysisSchema` and `plan` with `PlanSchema`
 - `server/src/routes/prepare.ts` — `createPrepareRoute`: `POST /api/dossiers/:id/company/research(/:section)`, resolves the dossier's provider (400 `Missing key: ...` when absent via `keyNameFor`), runs `researchAll`/`researchSection`, persists `company.md`; `POST /api/dossiers/:id/analysis` runs `analyze` against the stored offer/resume, persists `analysis.json`, returns the `Analysis`; `POST /api/dossiers/:id/plan` runs `generatePlan` against the stored offer/resume/company and the stored analysis (if any), persists `plan.json`, returns the `Plan`
+- `server/src/routes/sessions.ts` — `createSessionsRoute`: `GET`/`POST /api/dossiers/:id/sessions` (list/create, 201 on create), `GET /api/dossiers/:id/sessions/:sid`; `POST /api/dossiers/:id/sessions/:sid/turn` validates `{ text }` (zod non-empty, 400 before streaming), then `streamSSE`s `runTurn` — `stage`/`sources`/`chunk`/`done` events on success, a `error` event with the thrown error's message on failure (200 either way, since the stream already started), `signal` from `c.req.raw.signal`
 - `server/src/domain/types.ts` — zod schemas and TypeScript types for all domain entities (Dossier, Plan, Session, etc.)
 - `server/src/domain/skeleton.ts` — `SKELETON` constant with 7 interview phases and `LANGUAGE_SWITCH` phase, with `SkeletonPhase` interface
 - `server/src/domain/phases.ts` — phase engine: `turnFromHistory`, `totalQuestions`, `phaseForTurn`, `closedPhases`
@@ -32,6 +33,7 @@
 - `server/test/app.test.ts` — tests for `createApp` health endpoint and `readConfig` defaults
 - `server/test/routes/dossiers.test.ts` — tests for dossier and provider routes (create/list/get aggregate/patch/delete, text and document writes, 400/404 error mapping)
 - `server/test/routes/prepare.test.ts` — tests for `POST /api/dossiers/:id/company/research(/:section)` (200 + persisted `company.md`, 400 on unknown section) and `POST /api/dossiers/:id/analysis` (200 + persisted `analysis.json`, 400 on empty offer)
+- `server/test/routes/sessions.test.ts` — tests for session routes (create/list/get, SSE `turn` with `stage`/`chunk`/`done` events, 400 on empty turn text, SSE `error` event with `Generate the plan first` when the dossier has no plan)
 - `server/test/domain/sections.test.ts` — tests for `notFoundSentence` and `buildQuery` (company name, sites, known sector, not-found sentence)
 - `server/test/pipeline/research.test.ts` — tests for `parseCompany`/`renderCompany` round-trip, `researchSection` (updates one section, appends sources, not-found fallback), `researchAll` (sequential, calls `onSection`)
 - `server/test/pipeline/analysis.test.ts` — tests for `analyze` (400 on empty offer/resume before any provider call, `FakeProvider` structured round-trip, prompt contains both offer and resume text)

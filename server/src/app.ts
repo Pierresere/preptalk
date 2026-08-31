@@ -6,6 +6,7 @@ import type { SessionStore } from './storage/sessions.js'
 import { createDossiersRoute } from './routes/dossiers.js'
 import { createProvidersRoute } from './routes/providers.js'
 import { createPrepareRoute } from './routes/prepare.js'
+import { createSessionsRoute } from './routes/sessions.js'
 
 export interface AppDeps {
   readonly config: Config
@@ -20,6 +21,7 @@ export function createApp(deps: AppDeps): Hono {
   app.route('/', createProvidersRoute(deps))
   app.route('/', createDossiersRoute(deps))
   app.route('/', createPrepareRoute(deps))
+  app.route('/', createSessionsRoute(deps))
   app.onError((error, c) => {
     const status = typeof (error as unknown as { status?: unknown }).status === 'number' ? (error as unknown as { status: number }).status : 500
     return c.json({ error: error.message }, status as unknown as 400 | 404 | 422 | 500 | 502)
