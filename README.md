@@ -8,7 +8,7 @@ interview — with live coaching and a debrief at the end — against the AI
 provider of your choice, using your own API key.
 
 The server (`server/`) is complete and usable via its HTTP API. The web UI
-(`web/`) is under construction.
+(`web/`) is included — run `npm start` and open `http://localhost:4820`.
 
 ## Quick start
 
@@ -28,6 +28,32 @@ npm run dev
 ```
 
 The server listens on `http://localhost:4820` by default.
+
+## Usage
+
+A typical session, end to end:
+
+1. **Create a dossier** — click "New" and fill in the company name and
+   position. This creates a folder under `data/<slug>/`.
+2. **Paste the offer and resume** — open the dossier and paste the job offer
+   text and your resume text into their respective panels; add any supporting
+   documents (`.md`/`.txt`) you want the plan to draw on.
+3. **Research the company** — run company research to fetch/generate the
+   company background sections used later to tailor the interview.
+4. **Run the analysis** — compare the offer against your resume to see
+   covered, partial, and missing requirements.
+5. **Generate the plan** — produce a phased interview plan with a recruiter
+   persona, based on the analysis and company research.
+6. **Edit the plan** — the plan is plain JSON/text; adjust phases, questions,
+   or the persona by hand if you want to steer the interview.
+7. **Simulate the interview** — start a session and answer the recruiter's
+   questions; responses stream in with live coaching notes and source
+   citations from your dossier.
+8. **Review the debrief** — after the session, read the generated debrief and
+   optionally revisit the full transcript.
+
+To run the built app without Vite (`npm start`), the web UI is served
+directly by the server on `http://localhost:4820`.
 
 ## Environment variables (`server/.env`)
 

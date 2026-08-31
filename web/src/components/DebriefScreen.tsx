@@ -50,7 +50,7 @@ export function DebriefScreen({ id }: DebriefScreenProps) {
   const selected = sessions.find((s) => s.id === selectedId) ?? null
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 'var(--gap)' }}>
+    <div className="split-grid split-grid--side-first">
       <div className="session-list">
         {sessions.map((session) => (
           <button

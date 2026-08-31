@@ -32,7 +32,7 @@ export function InterviewScreen({ id }: InterviewScreenProps) {
           {t('interview.new')}
         </button>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 260px', gap: 'var(--gap)' }}>
+        <div className="split-grid split-grid--main-first">
           <div>
             <MessageList messages={session.messages} draft={draft} streaming={streaming} recruiter={recruiter} />
             <Composer disabled={streaming} streaming={streaming} onSend={(text) => void send(text)} onStop={stop} />
