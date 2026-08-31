@@ -69,3 +69,7 @@ export function toHtml(text: string): string {
 
   return html.join('')
 }
+
+export function toChatHtml(text: string): string {
+  return toHtml(text).replace(/<blockquote>/g, '<blockquote class="coaching">')
+}

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useT } from '../i18n'
-import { toHtml } from '../services/markdown.js'
+import { toChatHtml } from '../services/markdown.js'
 import type { Message } from '../types.js'
 
 interface MessageListProps {
@@ -10,16 +10,12 @@ interface MessageListProps {
   recruiter: string
 }
 
-function renderHtml(text: string): string {
-  return toHtml(text).replace(/<blockquote>/g, '<blockquote class="coaching">')
-}
-
 function Bubble({ role, text, label }: { role: 'user' | 'assistant'; text: string; label: string }) {
   return (
     <div className={role === 'user' ? 'message-user' : 'message-assistant'}>
       <div className="bubble">
         <strong>{label}</strong>
-        <div dangerouslySetInnerHTML={{ __html: renderHtml(text) }} />
+        <div dangerouslySetInnerHTML={{ __html: toChatHtml(text) }} />
       </div>
     </div>
   )

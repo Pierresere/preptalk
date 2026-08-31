@@ -63,6 +63,7 @@
   "interview.stop": "Arrêter",
   "interview.placeholder": "Écrivez votre réponse…",
   "interview.you": "Vous",
+  "interview.recruiter": "Recruteur",
   "interview.coaching": "Coaching",
   "interview.sources": "Sources",
   "interview.noSources": "Aucune source",
@@ -73,6 +74,9 @@
   "phase.debrief": "Debrief",
   "debrief.empty": "Aucune session pour le moment.",
   "debrief.sessions": "Sessions",
+  "debrief.messages": "{n} messages",
+  "debrief.showTranscript": "Afficher la transcription",
+  "debrief.hideTranscript": "Masquer la transcription",
   "error.missingKey": "Clé API manquante",
   "error.generic": "Une erreur est survenue"
 }

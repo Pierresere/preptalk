@@ -63,6 +63,7 @@
   "interview.stop": "Stop",
   "interview.placeholder": "Write your answer…",
   "interview.you": "You",
+  "interview.recruiter": "Recruiter",
   "interview.coaching": "Coaching",
   "interview.sources": "Sources",
   "interview.noSources": "No sources",
@@ -73,6 +74,9 @@
   "phase.debrief": "Debrief",
   "debrief.empty": "No sessions yet.",
   "debrief.sessions": "Sessions",
+  "debrief.messages": "{n} messages",
+  "debrief.showTranscript": "Show transcript",
+  "debrief.hideTranscript": "Hide transcript",
   "error.missingKey": "Missing API key",
   "error.generic": "Something went wrong"
 }
