@@ -5,6 +5,7 @@ import { LangSwitch } from './components/LangSwitch'
 import { DossierList } from './components/DossierList'
 import { DossierForm } from './components/DossierForm'
 import { useDossiers } from './hooks/useDossiers'
+import { PrepareScreen } from './components/PrepareScreen'
 import type { CreateDossierInput } from './services/api.js'
 import type { Screen } from './screens.js'
 
@@ -49,7 +50,10 @@ function Content() {
     return <DossiersScreen onOpen={(id) => setScreen({ name: 'prepare', id })} />
   }
   if (screen.name === 'prepare') {
-    return <p>prepare: {screen.id}</p>
+    return <PrepareScreen id={screen.id} onInterview={() => setScreen({ name: 'interview', id: screen.id })} />
+  }
+  if (screen.name === 'interview') {
+    return <p>interview: {screen.id}</p>
   }
   return null
 }

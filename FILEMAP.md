@@ -60,7 +60,7 @@
 - `web/test/i18n.test.tsx` — tests for `I18nProvider`/`useT` (translation, missing-key fallback, interpolation) and fr/en key-set parity
 - `web/test/theme.test.ts` — tests for `applyTheme`/`readTheme`/`writeTheme`
 - `web/src/main.tsx` — React entry point, mounts `App` into `#root`
-- `web/src/App.tsx` — top bar (app name, `ThemeSwitch`, `LangSwitch`) wrapped in `I18nProvider`; screen state (`Screen`) starts on `dossiers`, renders `DossierList`/`DossierForm` via `useDossiers`, opens `prepare` (placeholder `<p>`) on card click
+- `web/src/App.tsx` — top bar (app name, `ThemeSwitch`, `LangSwitch`) wrapped in `I18nProvider`; screen state (`Screen`) starts on `dossiers`, renders `DossierList`/`DossierForm` via `useDossiers`, opens `prepare` (`PrepareScreen`) on card click, `interview` still a placeholder `<p>`
 - `web/src/screens.ts` — `Screen` union type: `{ name: 'dossiers' } | { name: 'prepare'|'interview'|'debrief'; id: string }`
 - `web/src/hooks/useDossiers.ts` — `useDossiers()`: loads dossiers + providers on mount (`Promise.all`), exposes `loading`/`error`/`create`/`remove`/`reload`
 - `web/src/components/DossierForm.tsx` — controlled create-dossier form (company, position, sites textarea → array, language, provider/model selects synced to the chosen provider); submit disabled until company+position filled; shows `error.missingKey` + env var names when `providers` is empty
@@ -77,6 +77,11 @@
 - `web/src/components/ThemeSwitch.tsx` — cycles auto→light→dark
 - `web/src/components/LangSwitch.tsx` — toggles fr/en
 - `web/test/DossierForm.test.tsx` — submit disabled until company+position filled, then submits with sites split from newlines and the selected provider/model
+- `web/src/hooks/useDossier.ts` — `useDossier(id)`: loads the `DossierBundle` on mount; `busy` (`'research'|'analysis'|'plan'|'save'|null`) tracks the running action; `saveText`/`addDocument`/`removeDocument`/`researchAll`/`researchSection`/`runAnalysis`/`generatePlan`/`savePlan`/`reload` each set `busy`, call the matching `api.ts` function, patch `bundle` from the response (or reload for document actions), clear `busy` in `finally`, set `error` on `ApiError`
+- `web/src/components/PrepareScreen.tsx` — sub-tab row (`offer`/`resume`/`company`/`analysis`/`plan`/`documents`, via `useDossier`) plus a `nav.interview` button calling `onInterview`; offer/resume use `TextPanel`, documents uses `DocumentsPanel`, company/analysis/plan render placeholder `<pre>` panels with their action buttons (research/analyze/generate) disabled while `busy`
+- `web/src/components/TextPanel.tsx` — labelled textarea with local dirty-tracking draft state (reset when `value` prop changes); `prepare.save` (`.btn-primary`) disabled unless dirty or busy; shows `prepare.saved` for 2s after a successful save (`setTimeout`, cleared on unmount)
+- `web/src/components/DocumentsPanel.tsx` — document list (name + char count, remove button) and an add form (name input + textarea); add disabled unless the name matches `^[\w.-]+\.(md|txt)$` and has no `..`, text is non-empty, and nothing is busy
+- `web/test/TextPanel.test.tsx` — save button disabled until the textarea changes, then `onSave` is called with the edited text
 - `FILEMAP.md` — this file
 - `README.md` — project overview and setup instructions
 - `LICENSE` — MIT license
