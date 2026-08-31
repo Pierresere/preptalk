@@ -52,7 +52,21 @@
 - `server/src/storage/sessions.ts` — `SessionStore`: create/list/read/save interview sessions under `data/<dossierId>/sessions/<id>.json`
 - `server/test/storage/dossiers.test.ts` — tests for `slugify` and `DossierStore` (slug uniqueness, text/JSON round-trip, corrupt file, documents)
 - `server/test/storage/sessions.test.ts` — tests for `SessionStore` (create/read round-trip, newest-first list, missing dossier/session, corrupt file, save persists messages/debrief)
-- `web/package.json` — placeholder web workspace package (UI not yet implemented)
+- `web/package.json` — web workspace package (React 18 + Vite, vitest)
+- `web/tsconfig.json` — web TypeScript config, extends base, overrides module/jsx/lib/types for Vite
+- `web/vite.config.ts` — Vite + Vitest config: React plugin, `/api` dev proxy to `localhost:4820`, jsdom test environment
+- `web/index.html` — HTML entry; inline boot script resolves `preptalk.theme` (auto/light/dark) and sets `data-theme` before first paint
+- `web/test/setup.ts` — vitest setup: `@testing-library/jest-dom/vitest`
+- `web/test/i18n.test.tsx` — tests for `I18nProvider`/`useT` (translation, missing-key fallback, interpolation) and fr/en key-set parity
+- `web/test/theme.test.ts` — tests for `applyTheme`/`readTheme`/`writeTheme`
+- `web/src/main.tsx` — React entry point, mounts `App` into `#root`
+- `web/src/App.tsx` — top bar (app name, `ThemeSwitch`, `LangSwitch`) wrapped in `I18nProvider`, plus an empty `.screen`
+- `web/src/styles.css` — CSS variable theme tokens (light/dark via `data-theme`, `prefers-color-scheme` fallback), thin scrollbars, base layout classes (`.topbar`, `.screen`, `.panel`, `.btn`, `.chip*`, `.messages`, `.bubble`, `.coaching`, `.composer`, `.phasebar`)
+- `web/src/i18n/fr.json` / `web/src/i18n/en.json` — translation dictionaries (identical key sets, enforced by test)
+- `web/src/i18n/index.tsx` — `I18nProvider`, `useT`, `useLang`; lang persisted in `localStorage['preptalk.lang']`, missing key falls back to the key, `{var}` interpolation
+- `web/src/services/theme.ts` — `Theme`, `readTheme`/`resolve`/`applyTheme`/`writeTheme`/`followSystem`; storage key `preptalk.theme`
+- `web/src/components/ThemeSwitch.tsx` — cycles auto→light→dark
+- `web/src/components/LangSwitch.tsx` — toggles fr/en
 - `FILEMAP.md` — this file
 - `README.md` — project overview and setup instructions
 - `LICENSE` — MIT license
