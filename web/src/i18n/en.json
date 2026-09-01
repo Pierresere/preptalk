@@ -95,5 +95,18 @@
   "debrief.showTranscript": "Show transcript",
   "debrief.hideTranscript": "Hide transcript",
   "error.missingKey": "Missing API key",
-  "error.generic": "Something went wrong"
+  "error.generic": "Something went wrong",
+  "privacy.title": "What gets hidden",
+  "privacy.intro": "Before anything reaches the AI, we replace these details with labels. Check the list, and add whatever we missed.",
+  "privacy.names": "Detected names",
+  "privacy.always": "Always hidden",
+  "privacy.add": "Add a name",
+  "privacy.addAction": "Add",
+  "privacy.confirm": "Continue",
+  "privacy.kind.candidate": "you",
+  "privacy.kind.person": "someone else",
+  "privacy.kind.email": "email",
+  "privacy.kind.phone": "phone",
+  "privacy.kind.postal": "postal code",
+  "privacy.kind.profile": "profile"
 }

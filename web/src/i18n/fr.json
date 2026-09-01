@@ -95,5 +95,18 @@
   "debrief.showTranscript": "Afficher la transcription",
   "debrief.hideTranscript": "Masquer la transcription",
   "error.missingKey": "Clé API manquante",
-  "error.generic": "Une erreur est survenue"
+  "error.generic": "Une erreur est survenue",
+  "privacy.title": "Ce qui sera masqué",
+  "privacy.intro": "Avant d'envoyer quoi que ce soit à l'IA, on remplace ces informations par des étiquettes. Vérifie la liste : ce que nous avons manqué, ajoute-le.",
+  "privacy.names": "Noms détectés",
+  "privacy.always": "Toujours masqué",
+  "privacy.add": "Ajouter un nom",
+  "privacy.addAction": "Ajouter",
+  "privacy.confirm": "Continuer",
+  "privacy.kind.candidate": "toi",
+  "privacy.kind.person": "autre personne",
+  "privacy.kind.email": "courriel",
+  "privacy.kind.phone": "téléphone",
+  "privacy.kind.postal": "code postal",
+  "privacy.kind.profile": "profil"
 }

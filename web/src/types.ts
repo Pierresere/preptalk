@@ -78,6 +78,23 @@ export interface DossierBundle {
   plan: Plan | null
 }
 
+export interface ConfirmedName {
+  value: string
+  kind: 'candidate' | 'person'
+}
+
+export interface Detection {
+  value: string
+  kind: 'candidate' | 'person' | 'email' | 'phone' | 'postal' | 'profile'
+  context: string
+}
+
+export interface PrivacyReviewData {
+  suggested: ConfirmedName[]
+  detected: Detection[]
+  confirmed: ConfirmedName[] | null
+}
+
 export const SECTIONS: readonly { id: string; fr: string; en: string }[] = [
   { id: 'sector', fr: 'Secteur', en: 'Sector' },
   { id: 'products', fr: 'Produits et services', en: 'Products and services' },

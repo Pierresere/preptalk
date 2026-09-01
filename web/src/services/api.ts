@@ -1,9 +1,11 @@
 import type {
   Analysis,
+  ConfirmedName,
   Dossier,
   DossierBundle,
   Language,
   Plan,
+  PrivacyReviewData,
   ProviderId,
   ProviderInfo,
   Session,
@@ -113,6 +115,18 @@ export function listSessions(id: string): Promise<Session[]> {
 
 export function createSession(id: string): Promise<Session> {
   return request(`/api/dossiers/${id}/sessions`, { method: 'POST' })
+}
+
+export function getPrivacy(id: string): Promise<PrivacyReviewData> {
+  return request<PrivacyReviewData>(`/api/dossiers/${id}/privacy`)
+}
+
+export function putPrivacy(id: string, names: ConfirmedName[]): Promise<void> {
+  return request<void>(`/api/dossiers/${id}/privacy`, {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ names }),
+  })
 }
 
 export async function sendTurn(id: string, sid: string, text: string, signal: AbortSignal): Promise<Response> {
