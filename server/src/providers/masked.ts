@@ -1,4 +1,4 @@
-import { mask, unmask } from '../domain/privacy.js'
+import { createMasker, mask, unmask } from '../domain/privacy.js'
 import type { PersonalData } from '../domain/privacy.js'
 import { ProviderError } from './types.js'
 import type { Provider, SearchInput, SearchResult, StreamInput, StructuredInput } from './types.js'
@@ -52,32 +52,33 @@ export function withMasking(provider: Provider): Provider {
     models: provider.models,
 
     stream(input: StreamInput): AsyncIterable<string> {
-      const system = mask(input.system, input.personal)
-      const map = new Map(system.map)
-      const messages = input.messages.map((message) => {
-        const masked = mask(message.text, input.personal)
-        for (const [token, value] of masked.map) map.set(token, value)
-        return { role: message.role, text: masked.text }
-      })
+      // One masker per call: numbering (and thus token reuse) is shared across the system
+      // prompt and every message, so two distinct values never collide on the same token.
+      const masker = createMasker(input.personal)
+      const system = masker.mask(input.system)
+      const messages = input.messages.map((message) => ({
+        role: message.role,
+        text: masker.mask(message.text),
+      }))
       // `personal` is replaced, not forwarded: the confirmed names are themselves personal data
       // and have no business sitting in the object handed to the real provider.
       return rehydrate(
-        provider.stream({ ...input, system: system.text, messages, personal: NO_NAMES }),
-        map
+        provider.stream({ ...input, system, messages, personal: NO_NAMES }),
+        masker.map
       )
     },
 
     async structured<T>(input: StructuredInput<T>): Promise<T> {
-      const system = mask(input.system, input.personal)
-      const prompt = mask(input.prompt, input.personal)
-      const map = new Map([...system.map, ...prompt.map])
+      const masker = createMasker(input.personal)
+      const system = masker.mask(input.system)
+      const prompt = masker.mask(input.prompt)
       const result = await provider.structured({
         ...input,
-        system: system.text,
-        prompt: prompt.text,
+        system,
+        prompt,
         personal: NO_NAMES,
       })
-      return rehydrateDeep(result, map) as T
+      return rehydrateDeep(result, masker.map) as T
     },
 
     async search(input: SearchInput): Promise<SearchResult> {

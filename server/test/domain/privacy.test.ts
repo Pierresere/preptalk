@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { detect, mask, unmask, personalDataOf } from '../../src/domain/privacy.js'
+import { createMasker, detect, mask, unmask, personalDataOf } from '../../src/domain/privacy.js'
 import type { ConfirmedName, PersonalData } from '../../src/domain/privacy.js'
 import type { Dossier } from '../../src/domain/types.js'
 
@@ -53,6 +53,24 @@ describe('mask', () => {
     const out = mask('Coordonnateur qualité chez Câbles Ben-Mor.', personal)
     expect(out.text).toBe('Coordonnateur qualité chez Câbles Ben-Mor.')
     expect(out.map.size).toBe(0)
+  })
+})
+
+describe('createMasker', () => {
+  it('shares numbering across separate mask() calls on the same masker', () => {
+    const masker = createMasker({
+      names: [
+        { value: 'Marie Tremblay', kind: 'person' },
+        { value: 'Jean Roy', kind: 'person' },
+      ],
+      keep: [],
+    })
+    const system = masker.mask('Bonjour Marie Tremblay.')
+    const message = masker.mask('Jean Roy est aussi présent.')
+    expect(system).toBe('Bonjour [PERSONNE_1].')
+    expect(message).toBe('[PERSONNE_2] est aussi présent.')
+    expect(masker.map.get('[PERSONNE_1]')).toBe('Marie Tremblay')
+    expect(masker.map.get('[PERSONNE_2]')).toBe('Jean Roy')
   })
 })
 

@@ -119,29 +119,51 @@ export function detect(text: string, personal: PersonalData): Detection[] {
   }))
 }
 
-export function mask(text: string, personal: PersonalData): Masking {
-  const spans = collect(text, personal)
+export interface Masker {
+  mask(text: string): string
+  readonly map: ReadonlyMap<string, string>
+}
+
+/**
+ * Stateful masker: shares one token counter, one value→token map, and one
+ * output token→value map across every `mask(text)` call, so numbering stays
+ * continuous over a whole request and a given value always gets the same
+ * token, no matter which call (system, or which message) first saw it.
+ */
+export function createMasker(personal: PersonalData): Masker {
   const map = new Map<string, string>()
   const tokenFor = new Map<string, string>()
   const counters = new Map<DetectionKind, number>()
-  const parts: string[] = []
-  let cursor = 0
-  for (const span of spans) {
-    const value = text.slice(span.start, span.end)
-    const key = `${span.kind}:${value}`
-    let token = tokenFor.get(key)
-    if (token === undefined) {
-      const next = (counters.get(span.kind) ?? 0) + 1
-      counters.set(span.kind, next)
-      token = `[${TOKEN_PREFIX[span.kind]}_${next}]`
-      tokenFor.set(key, token)
-      map.set(token, value)
-    }
-    parts.push(text.slice(cursor, span.start), token)
-    cursor = span.end
+  return {
+    map,
+    mask(text: string): string {
+      const spans = collect(text, personal)
+      const parts: string[] = []
+      let cursor = 0
+      for (const span of spans) {
+        const value = text.slice(span.start, span.end)
+        const key = `${span.kind}:${value}`
+        let token = tokenFor.get(key)
+        if (token === undefined) {
+          const next = (counters.get(span.kind) ?? 0) + 1
+          counters.set(span.kind, next)
+          token = `[${TOKEN_PREFIX[span.kind]}_${next}]`
+          tokenFor.set(key, token)
+          map.set(token, value)
+        }
+        parts.push(text.slice(cursor, span.start), token)
+        cursor = span.end
+      }
+      parts.push(text.slice(cursor))
+      return parts.join('')
+    },
   }
-  parts.push(text.slice(cursor))
-  return { text: parts.join(''), map }
+}
+
+export function mask(text: string, personal: PersonalData): Masking {
+  const masker = createMasker(personal)
+  const maskedText = masker.mask(text)
+  return { text: maskedText, map: masker.map }
 }
 
 export function unmask(text: string, map: ReadonlyMap<string, string>): string {
