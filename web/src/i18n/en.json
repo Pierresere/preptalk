@@ -109,5 +109,7 @@
   "privacy.kind.email": "email",
   "privacy.kind.phone": "phone",
   "privacy.kind.postal": "postal code",
-  "privacy.kind.profile": "profile"
+  "privacy.kind.profile": "profile",
+  "privacy.loadFailed": "Could not check what needs to be hidden.",
+  "privacy.retry": "Try again"
 }

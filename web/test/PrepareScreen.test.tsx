@@ -42,4 +42,15 @@ describe('PrepareScreen', () => {
     )
     expect(await screen.findByText(/étapes prêtes/)).toBeInTheDocument()
   })
+
+  it('fails closed and shows a retry option when getPrivacy rejects', async () => {
+    vi.mocked(api.getPrivacy).mockRejectedValue(new Error('network error'))
+    render(
+      <I18nProvider>
+        <PrepareScreen id="ben-mor" onInterview={vi.fn()} />
+      </I18nProvider>
+    )
+    expect(await screen.findByText('Impossible de vérifier les informations à masquer.')).toBeInTheDocument()
+    expect(screen.queryByText(/étapes prêtes/)).not.toBeInTheDocument()
+  })
 })

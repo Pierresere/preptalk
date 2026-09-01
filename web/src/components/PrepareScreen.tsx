@@ -32,17 +32,24 @@ export function PrepareScreen({ id, onInterview }: PrepareScreenProps) {
   const t = useT()
   const [tab, setTab] = useState<SubTab>('offer')
   const [reviewed, setReviewed] = useState<boolean | null>(null)
+  const [failed, setFailed] = useState(false)
+  const [reloadToken, setReloadToken] = useState(0)
 
   useEffect(() => {
     let alive = true
     setReviewed(null)
-    void getPrivacy(id).then((privacy) => {
-      if (alive) setReviewed(privacy.confirmed !== null)
-    })
+    setFailed(false)
+    getPrivacy(id)
+      .then((privacy) => {
+        if (alive) setReviewed(privacy.confirmed !== null)
+      })
+      .catch(() => {
+        if (alive) setFailed(true)
+      })
     return () => {
       alive = false
     }
-  }, [id])
+  }, [id, reloadToken])
 
   const {
     bundle,
@@ -57,6 +64,16 @@ export function PrepareScreen({ id, onInterview }: PrepareScreenProps) {
     savePlan,
   } = useDossier(id)
 
+  if (failed) {
+    return (
+      <div className="panel">
+        <p>{t('privacy.loadFailed')}</p>
+        <button type="button" className="btn btn-primary" onClick={() => setReloadToken((n) => n + 1)}>
+          {t('privacy.retry')}
+        </button>
+      </div>
+    )
+  }
   if (reviewed === null || !bundle) return null
   if (!reviewed) return <PrivacyReview id={id} onConfirmed={() => setReviewed(true)} />
 

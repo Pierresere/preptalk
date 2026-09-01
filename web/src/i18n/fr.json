@@ -109,5 +109,7 @@
   "privacy.kind.email": "courriel",
   "privacy.kind.phone": "téléphone",
   "privacy.kind.postal": "code postal",
-  "privacy.kind.profile": "profil"
+  "privacy.kind.profile": "profil",
+  "privacy.loadFailed": "Impossible de vérifier les informations à masquer.",
+  "privacy.retry": "Réessayer"
 }
