@@ -109,6 +109,7 @@
 - `docs/marche-et-modele-economique.md` — market study (2026-08-31): competitors in France and Quebec, positioning, credit-based pricing, product roadmap and the targeted-resume approach
 - `docs/conformite-loi-25.md` — Quebec Law 25 study (2026-08-31): what today's provider calls transmit, pseudonymisation design (`Provider` decorator, persons masked / legal entities kept), Vertex AI Montreal region and its caveats, compliance plan
 - `docs/superpowers/specs/2026-08-31-pseudonymisation-design.md` — design spec for the pseudonymisation layer: visible masking as the guiding principle (a per-dossier review screen the user corrects), `PersonalData` on `StreamInput`/`StructuredInput` as the fail-closed mechanism, `domain/privacy.ts` (`detect`/`mask`/`unmask`/`suggestNames`, token format, detection rules, `keep` exemption), `privacy.json` storing the confirmed list while the token map stays per-call, streaming and structured rehydration, `search()` guard, logging and at-rest leak vectors, test plan including the compliance frontier test
+- `docs/superpowers/plans/2026-08-31-pseudonymisation.md` — 7-task TDD implementation plan for the pseudonymisation spec: masking core, name suggestion, provider decorator with the required `personal` field, `privacy.json` persistence, review screen, prepare-flow interception, compliance frontier test
 - `FILEMAP.md` — this file
 - `README.md` — project overview and setup instructions
 - `LICENSE` — MIT license
