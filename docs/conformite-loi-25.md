@@ -58,7 +58,7 @@ consenti.
 
 | Méthode | Contenu transmis | Traitement |
 |---|---|---|
-| `search()` | Nom d'entreprise, poste, sites (`buildQuery`) — **aucune donnée candidat** | Passe tel quel |
+| `search()` | Nom d'entreprise, poste, sites (`buildQuery`) — **aucune donnée candidat** | Passe tel quel, sous garde-fou |
 | `structured()` | CV, offre, documents (analyse, plan) | **Pseudonymisé** |
 | `stream()` | CV, offre, documents (entretien, débrief) | **Pseudonymisé** |
 
@@ -69,9 +69,27 @@ jamais le vrai nom, la pseudonymisation ne dégradera donc pas la qualité.
 
 **Un décorateur autour de l'interface `Provider`, posé dans `providers/registry.ts`.** Chaque
 provider réel est enveloppé : `stream` et `structured` masquent en entrée et réhydratent en sortie,
-`search` passe inchangé. Aucun pipeline n'est modifié, et il devient **impossible d'oublier la
-protection en ajoutant une fonctionnalité** — c'est la « vie privée par défaut » garantie par
-l'architecture plutôt que par la discipline.
+`search` ne transporte pas de contenu personnel mais est gardé par un garde-fou qui refuse la
+requête si une valeur personnelle s'y trouve malgré tout.
+
+Les trois entrées du `Provider` (`StreamInput`, `StructuredInput` et `SearchInput`) portent
+désormais un champ **obligatoire** `personal` : chaque pipeline et chaque route a donc été modifié
+pour le fournir. C'est précisément ce qui rend **impossible d'oublier la protection en ajoutant une
+fonctionnalité** — un nouvel appel qui ne fournit pas `personal` ne compile pas. La « vie privée par
+défaut » est garantie par le typage plutôt que par la discipline.
+
+**Un masquage visible.** La détection automatique des noms propres n'atteint jamais 100 % de rappel.
+Plutôt que de le cacher, l'application **montre à l'utilisateur ce qui sera masqué** : un écran
+« Ce qui sera masqué » présente les valeurs détectées avec leur contexte, les noms suggérés (cochés
+par défaut, décochables) et un champ pour ajouter ce que les règles ont raté. Les identifiants
+directs trouvés par expression régulière — courriels, téléphones, codes postaux, profils — sont
+affichés mais non décochables. La liste confirmée est **persistée par dossier** dans
+`data/<dossier>/privacy.json` ; la table de correspondance `jeton → valeur`, elle, n'est **jamais**
+écrite sur disque et ne vit que le temps d'un appel.
+
+`privacy.json` absent signifie « dossier jamais revu » : le serveur **refuse** alors tout appel IA
+(HTTP 409) au lieu de partir sans masquage. Le refus, et non une liste vide, est le comportement par
+défaut.
 
 Table de correspondance réversible : `Pierre Séré → [CANDIDAT_1]`, `pierre@… → [COURRIEL_1]`,
 `514-555-0123 → [TEL_1]`. Déterministe, testable, sans appel réseau.
@@ -81,10 +99,14 @@ Conception détaillée : [`docs/superpowers/specs/2026-08-31-pseudonymisation-de
 ### Deux points durs identifiés
 
 1. **Détecter les noms.** Courriels, téléphones et adresses se trouvent par expression régulière de
-   façon fiable. Les *noms* dans de la prose, non. Solution retenue : demander au candidat son nom,
-   courriel et téléphone une fois (au dépôt du CV), puis remplacer par correspondance exacte et
-   variantes (accents, initiales). Seul impact visible : un ajout au formulaire.
-2. **Réhydratation en streaming.** Un jeton `[CANDIDAT]` peut être coupé entre deux morceaux SSE ;
+   façon fiable. Les *noms* dans de la prose, non. Solution retenue : le nom du candidat est
+   **suggéré automatiquement** à partir de l'en-tête du CV (`domain/suggest.ts`, purement local,
+   sans IA), puis **confirmé par l'utilisateur dans l'écran de revue**, où il peut corriger la
+   suggestion et ajouter les tiers oubliés. Le remplacement se fait ensuite par correspondance
+   exacte, insensible à la casse et aux accents, sur le nom complet puis sur chacune de ses parties
+   de 3 caractères ou plus. **Le formulaire de création ne change pas** : aucun champ « ton nom »,
+   « ton courriel » ou « ton téléphone » n'y est ajouté.
+2. **Réhydratation en streaming.** Un jeton `[CANDIDAT_n]` peut être coupé entre deux morceaux SSE ;
    il faut un tampon de quelques caractères dans le décorateur.
 
 Un test « aucune donnée personnelle ne franchit la frontière provider » servira de preuve de
@@ -143,13 +165,18 @@ Pseudonymisation **et** Vertex Montréal sont complémentaires, pas redondants :
 protège aussi les tiers nommés dans les offres et permet de changer de fournisseur sans reconstruire
 la conformité.
 
-1. Pseudonymisation avant tout appel LLM (décorateur `Provider`).
-   Preuve : `server/test/privacy-frontier.test.ts` échoue si une valeur personnelle atteint un provider.
+1. Pseudonymisation avant tout appel LLM (décorateur `Provider`), précédée de l'écran de revue
+   « Ce qui sera masqué » dont la liste confirmée est persistée dans `privacy.json` ; sans ce
+   fichier, le serveur refuse l'appel (409).
+   Preuve : `server/test/privacy-frontier.test.ts` échoue si une valeur personnelle atteint un
+   provider ; il couvre `analyze` et `runTurn` en passant par le chemin réel du produit
+   (suggestion, écriture de `privacy.json`, relecture).
 2. Provider Vertex AI, région Montréal pour les appels porteurs de données personnelles.
 3. Consentement explicite à la création du dossier : mention claire du fournisseur, du lieu
    d'hébergement et de l'absence d'entraînement sur les données, avec lien vers la politique.
 4. Hébergement des dossiers au Canada lors du passage en SaaS.
-5. Effacement réel et complet (dossier + sessions + débriefs), exposé comme un droit.
+5. Effacement réel et complet (dossier + sessions + débriefs + `privacy.json`), exposé comme un
+   droit.
 6. Rédiger l'**ÉFVP** et la **politique de confidentialité** avant le lancement public.
 7. Désigner le responsable de la protection des renseignements personnels.
 
