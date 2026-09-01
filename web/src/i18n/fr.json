@@ -40,6 +40,7 @@
   "prepare.analysis": "Analyse",
   "prepare.plan": "Plan",
   "prepare.documents": "Documents",
+  "prepare.privacy": "Confidentialité",
   "prepare.progress": "{done}/{total} étapes prêtes",
   "prepare.progressHint": "Complète les étapes pour un entretien au plus proche du réel.",
   "prepare.ready": "Tout est prêt, à toi de jouer !",

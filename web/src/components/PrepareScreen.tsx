@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useT } from '../i18n'
 import { useDossier } from '../hooks/useDossier.js'
+import { getPrivacy } from '../services/api.js'
 import { TextPanel } from './TextPanel.js'
 import { DocumentsPanel } from './DocumentsPanel.js'
 import { CompanyPanel } from './CompanyPanel.js'
 import { AnalysisPanel } from './AnalysisPanel.js'
 import { PlanEditor } from './PlanEditor.js'
+import { PrivacyReview } from './PrivacyReview.js'
 import type { DossierBundle } from '../types.js'
 
 type SubTab = 'offer' | 'resume' | 'company' | 'analysis' | 'plan' | 'documents'
@@ -29,6 +31,19 @@ interface PrepareScreenProps {
 export function PrepareScreen({ id, onInterview }: PrepareScreenProps) {
   const t = useT()
   const [tab, setTab] = useState<SubTab>('offer')
+  const [reviewed, setReviewed] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    let alive = true
+    setReviewed(null)
+    void getPrivacy(id).then((privacy) => {
+      if (alive) setReviewed(privacy.confirmed !== null)
+    })
+    return () => {
+      alive = false
+    }
+  }, [id])
+
   const {
     bundle,
     busy,
@@ -42,7 +57,8 @@ export function PrepareScreen({ id, onInterview }: PrepareScreenProps) {
     savePlan,
   } = useDossier(id)
 
-  if (!bundle) return null
+  if (reviewed === null || !bundle) return null
+  if (!reviewed) return <PrivacyReview id={id} onConfirmed={() => setReviewed(true)} />
 
   const doneCount = STEPS.filter((step) => stepDone(bundle, step)).length
   const ready = doneCount === STEPS.length
@@ -81,6 +97,9 @@ export function PrepareScreen({ id, onInterview }: PrepareScreenProps) {
           onClick={() => setTab('documents')}
         >
           {t('prepare.documents')}
+        </button>
+        <button type="button" className="btn" onClick={() => setReviewed(false)}>
+          {t('prepare.privacy')}
         </button>
       </div>
 

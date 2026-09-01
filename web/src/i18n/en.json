@@ -40,6 +40,7 @@
   "prepare.analysis": "Analysis",
   "prepare.plan": "Plan",
   "prepare.documents": "Documents",
+  "prepare.privacy": "Privacy",
   "prepare.progress": "{done}/{total} steps ready",
   "prepare.progressHint": "Complete the steps for the most realistic interview.",
   "prepare.ready": "Everything is ready, your turn!",
