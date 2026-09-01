@@ -42,6 +42,27 @@ describe('PrivacyReview', () => {
     await waitFor(() => expect(api.putPrivacy).toHaveBeenCalledWith('ben-mor', []))
   })
 
+  it('saves a newly added name alongside a previously confirmed one', async () => {
+    vi.mocked(api.getPrivacy).mockResolvedValue({
+      suggested: [{ value: 'Pierre Séré', kind: 'candidate' }],
+      detected: [{ value: 'pierre@example.com', kind: 'email', context: 'écrire à pierre@example.com' }],
+      confirmed: [{ value: 'Pierre Séré', kind: 'candidate' }],
+    })
+    render(
+      <I18nProvider>
+        <PrivacyReview id="ben-mor" onConfirmed={vi.fn()} />
+      </I18nProvider>
+    )
+    await screen.findByText('Pierre Séré')
+    fireEvent.change(screen.getByLabelText(/ajouter un nom/i), { target: { value: 'Jean Dupont' } })
+    fireEvent.click(screen.getByRole('button', { name: /^ajouter$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /continuer/i }))
+    await waitFor(() => expect(api.putPrivacy).toHaveBeenCalledWith('ben-mor', [
+      { value: 'Pierre Séré', kind: 'candidate' },
+      { value: 'Jean Dupont', kind: 'person' },
+    ]))
+  })
+
   it('lists regex detections without a checkbox', async () => {
     render(
       <I18nProvider>

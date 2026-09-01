@@ -20,6 +20,7 @@ function contextOf(name: ConfirmedName, detected: readonly Detection[]): string 
 export function PrivacyReview({ id, onConfirmed }: PrivacyReviewProps) {
   const t = useT()
   const [data, setData] = useState<PrivacyReviewData | null>(null)
+  const [names, setNames] = useState<ConfirmedName[]>([])
   const [checked, setChecked] = useState<Set<string>>(new Set())
   const [extra, setExtra] = useState('')
   const [saving, setSaving] = useState(false)
@@ -28,9 +29,10 @@ export function PrivacyReview({ id, onConfirmed }: PrivacyReviewProps) {
     let alive = true
     void getPrivacy(id).then((loaded) => {
       if (!alive) return
-      const names = loaded.confirmed ?? loaded.suggested
+      const loadedNames = loaded.confirmed ?? loaded.suggested
       setData(loaded)
-      setChecked(new Set(names.map(keyOf)))
+      setNames(loadedNames)
+      setChecked(new Set(loadedNames.map(keyOf)))
     })
     return () => {
       alive = false
@@ -39,7 +41,6 @@ export function PrivacyReview({ id, onConfirmed }: PrivacyReviewProps) {
 
   if (data === null) return null
 
-  const names: ConfirmedName[] = [...(data.confirmed ?? data.suggested)]
   const rules: Detection[] = data.detected.filter((d) => d.kind !== 'candidate' && d.kind !== 'person')
 
   const toggle = (name: ConfirmedName): void => {
@@ -56,7 +57,7 @@ export function PrivacyReview({ id, onConfirmed }: PrivacyReviewProps) {
     const value = extra.trim()
     if (value === '') return
     const name: ConfirmedName = { value, kind: 'person' }
-    setData({ ...data, suggested: [...names, name] })
+    setNames((current) => [...current, name])
     setChecked((current) => new Set(current).add(keyOf(name)))
     setExtra('')
   }
