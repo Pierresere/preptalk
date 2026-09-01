@@ -144,6 +144,7 @@ protège aussi les tiers nommés dans les offres et permet de changer de fournis
 la conformité.
 
 1. Pseudonymisation avant tout appel LLM (décorateur `Provider`).
+   Preuve : `server/test/privacy-frontier.test.ts` échoue si une valeur personnelle atteint un provider.
 2. Provider Vertex AI, région Montréal pour les appels porteurs de données personnelles.
 3. Consentement explicite à la création du dossier : mention claire du fournisseur, du lieu
    d'hébergement et de l'absence d'entraînement sur les données, avec lien vers la politique.

@@ -43,6 +43,7 @@
 - `server/test/pipeline/interview.test.ts` — tests for `buildChunks` (expected ids, skips empty-bodied chunks) and `runTurn` (409 on missing plan, stage order `retrieving`→`thinking` with the system prompt containing `Question 1 of` and the session saved with 2 messages, debrief turn after `totalQuestions` assistant messages emits stage `debrief` and sets `session.debrief`)
 - `server/test/providers/fake.test.ts` — tests for `FakeProvider` streaming and structured output validation
 - `server/test/providers/masked.test.ts` — tests for `withMasking`: masks the outgoing prompt and rehydrates the streamed answer, rehydrates a token split across chunks, emits an unclosed bracket run as plain text, rehydrates strings nested in a structured result, passes a clean search query through untouched, rejects a search query carrying personal data without echoing it
+- `server/test/privacy-frontier.test.ts` — compliance proof: runs `analyze` through `withMasking(FakeProvider)` with a realistic resume and offer, asserts no personal value (names, email, phone, postal code, LinkedIn profile) appears in the captured payloads while the company and position still do
 - `server/test/providers/anthropic.test.ts` — unit test for `extractSearch` (no network)
 - `server/test/providers/openai.test.ts` — unit test for `extractCitations` (no network)
 - `server/test/providers/gemini.test.ts` — unit test for `extractGrounding` (no network)
