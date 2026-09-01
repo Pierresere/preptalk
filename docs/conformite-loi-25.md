@@ -73,8 +73,10 @@ provider réel est enveloppé : `stream` et `structured` masquent en entrée et 
 protection en ajoutant une fonctionnalité** — c'est la « vie privée par défaut » garantie par
 l'architecture plutôt que par la discipline.
 
-Table de correspondance réversible par dossier : `Pierre Séré → [CANDIDAT]`,
-`pierre@… → [COURRIEL_1]`, `514-555-0123 → [TEL_1]`. Déterministe, testable, sans appel réseau.
+Table de correspondance réversible : `Pierre Séré → [CANDIDAT_1]`, `pierre@… → [COURRIEL_1]`,
+`514-555-0123 → [TEL_1]`. Déterministe, testable, sans appel réseau.
+
+Conception détaillée : [`docs/superpowers/specs/2026-08-31-pseudonymisation-design.md`](./superpowers/specs/2026-08-31-pseudonymisation-design.md).
 
 ### Deux points durs identifiés
 
