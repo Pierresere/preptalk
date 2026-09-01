@@ -108,7 +108,7 @@
 - `web/test/HomeScreen.test.tsx` — clicking the candidate card calls `onCandidate` once, and the recruiter card shows the "coming soon" badge
 - `docs/marche-et-modele-economique.md` — market study (2026-08-31): competitors in France and Quebec, positioning, credit-based pricing, product roadmap and the targeted-resume approach
 - `docs/conformite-loi-25.md` — Quebec Law 25 study (2026-08-31): what today's provider calls transmit, pseudonymisation design (`Provider` decorator, persons masked / legal entities kept), Vertex AI Montreal region and its caveats, compliance plan
-- `docs/superpowers/specs/2026-08-31-pseudonymisation-design.md` — design spec for the pseudonymisation layer: `PersonalData` on `StreamInput`/`StructuredInput` as the fail-closed mechanism, `domain/privacy.ts` masker (token format, detection rules, `keep` exemption), streaming and structured rehydration, `search()` guard, test plan including the compliance frontier test
+- `docs/superpowers/specs/2026-08-31-pseudonymisation-design.md` — design spec for the pseudonymisation layer: visible masking as the guiding principle (a per-dossier review screen the user corrects), `PersonalData` on `StreamInput`/`StructuredInput` as the fail-closed mechanism, `domain/privacy.ts` (`detect`/`mask`/`unmask`/`suggestNames`, token format, detection rules, `keep` exemption), `privacy.json` storing the confirmed list while the token map stays per-call, streaming and structured rehydration, `search()` guard, logging and at-rest leak vectors, test plan including the compliance frontier test
 - `FILEMAP.md` — this file
 - `README.md` — project overview and setup instructions
 - `LICENSE` — MIT license
