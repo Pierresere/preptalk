@@ -31,6 +31,17 @@ describe('PrepareScreen', () => {
     expect(await screen.findByText('Ce qui sera masqué')).toBeInTheDocument()
   })
 
+  it('shows the checklist on an empty dossier, since there is nothing to review yet', async () => {
+    vi.mocked(api.getDossier).mockResolvedValue({ ...BUNDLE, offer: '', resume: '   ' })
+    render(
+      <I18nProvider>
+        <PrepareScreen id="ben-mor" onInterview={vi.fn()} />
+      </I18nProvider>
+    )
+    expect(await screen.findByText(/étapes prêtes/)).toBeInTheDocument()
+    expect(screen.queryByText('Ce qui sera masqué')).not.toBeInTheDocument()
+  })
+
   it('shows the checklist once the list is confirmed', async () => {
     vi.mocked(api.getPrivacy).mockResolvedValue({
       suggested: [], detected: [], confirmed: [{ value: 'Pierre Séré', kind: 'candidate' }],

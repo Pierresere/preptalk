@@ -12,7 +12,8 @@ const STOP_WORDS = new Set([
   'vendredi', 'samedi', 'dimanche',
 ])
 
-const WORD = "[A-ZÀ-Ö][\\p{L}''-]+"
+// Both apostrophes: the typewriter U+0027 and the typographic U+2019 ("L’Écuyer").
+const WORD = "[A-ZÀ-Ö][\\p{L}'’-]+"
 const NAME_RE = new RegExp(`${WORD}(?:\\s+${WORD}){1,3}`, 'gu')
 
 function isName(value: string): boolean {

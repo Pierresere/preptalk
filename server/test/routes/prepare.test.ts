@@ -41,6 +41,39 @@ const createBody = {
   model: 'fake',
 }
 
+/** Every AI route is gated behind the privacy review; tests that reach a provider must pass it. */
+async function markReviewed(id: string): Promise<void> {
+  await store.writePrivacy(id, { names: [], reviewedAt: '2026-01-01T00:00:00.000Z' })
+}
+
+describe('privacy gate', () => {
+  it('refuses an analysis on a dossier that was never reviewed', async () => {
+    const created = await (
+      await app.request('/api/dossiers', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(createBody),
+      })
+    ).json()
+
+    const res = await app.request(`/api/dossiers/${created.id}/analysis`, { method: 'POST' })
+    expect(res.status).toBe(409)
+  })
+
+  it('refuses company research on a dossier that was never reviewed', async () => {
+    const created = await (
+      await app.request('/api/dossiers', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(createBody),
+      })
+    ).json()
+
+    const res = await app.request(`/api/dossiers/${created.id}/company/research`, { method: 'POST' })
+    expect(res.status).toBe(409)
+  })
+})
+
 describe('POST /api/dossiers/:id/company/research/:section', () => {
   it('researches one section and persists company.md', async () => {
     const created = await (
@@ -51,6 +84,7 @@ describe('POST /api/dossiers/:id/company/research/:section', () => {
       })
     ).json()
 
+    await markReviewed(created.id)
     const res = await app.request(`/api/dossiers/${created.id}/company/research/products`, {
       method: 'POST',
     })
@@ -72,6 +106,7 @@ describe('POST /api/dossiers/:id/company/research/:section', () => {
       })
     ).json()
 
+    await markReviewed(created.id)
     const res = await app.request(`/api/dossiers/${created.id}/company/research/bogus`, {
       method: 'POST',
     })
@@ -109,6 +144,7 @@ describe('POST /api/dossiers/:id/analysis', () => {
       sessions: new SessionStore(dataDir),
     })
 
+    await markReviewed(created.id)
     const offer = 'We are looking for a senior engineer with strong leadership skills. '.repeat(2)
     const resume = 'Experienced engineer who led teams and delivered projects on time. '.repeat(2)
     await store.writeText(created.id, 'offer', offer)
@@ -132,6 +168,7 @@ describe('POST /api/dossiers/:id/analysis', () => {
       })
     ).json()
 
+    await markReviewed(created.id)
     const res = await app.request(`/api/dossiers/${created.id}/analysis`, { method: 'POST' })
     expect(res.status).toBe(400)
   })
@@ -147,6 +184,7 @@ describe('POST /api/dossiers/:id/company/research', () => {
       })
     ).json()
 
+    await markReviewed(created.id)
     const res = await app.request(`/api/dossiers/${created.id}/company/research`, { method: 'POST' })
     expect(res.status).toBe(200)
     const body = await res.json()

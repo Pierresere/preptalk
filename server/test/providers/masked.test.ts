@@ -101,13 +101,20 @@ describe('withMasking', () => {
 
   it('passes a clean search query through untouched', async () => {
     const fake = new FakeProvider({ search: { text: 'ok', sources: [] } })
-    const result = await withMasking(fake).search({ ...base, query: 'Câbles Ben-Mor secteur' })
+    const result = await withMasking(fake).search({ ...base, personal, query: 'Câbles Ben-Mor secteur' })
     expect(result.text).toBe('ok')
+  })
+
+  it('rejects a search query carrying a confirmed name', async () => {
+    const fake = new FakeProvider({ search: { text: 'ok', sources: [] } })
+    const call = withMasking(fake).search({ ...base, personal, query: 'Pierre Séré Câbles Ben-Mor' })
+    await expect(call).rejects.toThrow(/^Personal data in search query$/)
+    expect(fake.calls).toHaveLength(0)
   })
 
   it('rejects a search query carrying personal data, without echoing it', async () => {
     const fake = new FakeProvider({ search: { text: 'ok', sources: [] } })
-    const call = withMasking(fake).search({ ...base, query: 'écrire à pierre.sere@example.com' })
+    const call = withMasking(fake).search({ ...base, personal, query: 'écrire à pierre.sere@example.com' })
     await expect(call).rejects.toBeInstanceOf(ProviderError)
     await expect(call).rejects.toThrow(/^Personal data in search query$/)
     expect(fake.calls).toHaveLength(0)

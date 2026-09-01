@@ -116,6 +116,7 @@ describe('runTurn', () => {
     await dossiers.writeText(dossier.id, 'resume', 'Experienced engineer.')
     await dossiers.writeText(dossier.id, 'company', '## Sector\n\nWidgets.')
     await dossiers.writeJson(dossier.id, 'plan', makePlan())
+    await dossiers.writePrivacy(dossier.id, { names: [], reviewedAt: '2026-01-01T00:00:00.000Z' })
     const session = await sessions.create(dossier)
     return { dossier, session }
   }
@@ -140,6 +141,21 @@ describe('runTurn', () => {
         { onStage: () => {}, onSources: () => {}, onDelta: () => {} }
       )
     ).rejects.toMatchObject(new ProviderError('Generate the plan first', 409))
+  })
+
+  test('un-reviewed dossier rejects with 409', async () => {
+    const { dossier, session } = await setup()
+    await fs.rm(path.join(dir, dossier.id, 'privacy.json'), { force: true })
+    const provider = new FakeProvider({ stream: 'Hello there.' })
+    const providers = new Map([['gemini', provider]] as const)
+
+    await expect(
+      runTurn(
+        { dossiers, sessions, providers },
+        { dossierId: dossier.id, sessionId: session.id, userText: 'Hi', signal: new AbortController().signal },
+        { onStage: () => {}, onSources: () => {}, onDelta: () => {} }
+      )
+    ).rejects.toMatchObject(new ProviderError('Review the privacy list first', 409))
   })
 
   test('emits stages in order, saves session, includes Question 1 of in system', async () => {

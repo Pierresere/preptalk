@@ -1,4 +1,5 @@
 import type { Dossier, Language } from '../domain/types.js'
+import type { PersonalData } from '../domain/privacy.js'
 import type { Provider } from '../providers/types.js'
 import { SECTION_IDS, SECTION_TITLES, buildQuery, notFoundSentence, type SectionId } from '../domain/sections.js'
 
@@ -50,10 +51,11 @@ async function searchSection(
   dossier: Dossier,
   section: SectionId,
   knownSector: string | null,
+  personal: PersonalData,
   signal: AbortSignal
 ): Promise<string> {
   const query = buildQuery(section, dossier, knownSector, dossier.language)
-  const result = await provider.search({ query, model: dossier.model, signal })
+  const result = await provider.search({ query, personal, model: dossier.model, signal })
   const text = result.text.trim()
   if (text === '') return notFoundSentence(dossier.language)
   return appendSources(text, result.sources, dossier.language)
@@ -64,11 +66,12 @@ export async function researchSection(
   dossier: Dossier,
   section: SectionId,
   currentCompanyMd: string,
+  personal: PersonalData,
   signal: AbortSignal = new AbortController().signal
 ): Promise<string> {
   const sections = parseCompany(currentCompanyMd)
   const knownSector = section === 'sector' ? null : (sections.get('sector') ?? null)
-  const text = await searchSection(provider, dossier, section, knownSector, signal)
+  const text = await searchSection(provider, dossier, section, knownSector, personal, signal)
   sections.set(section, text)
   return renderCompany(sections, dossier.language)
 }
@@ -77,13 +80,14 @@ export async function researchAll(
   provider: Provider,
   dossier: Dossier,
   onSection: (id: SectionId) => void,
+  personal: PersonalData,
   signal: AbortSignal = new AbortController().signal
 ): Promise<string> {
   const sections = new Map<SectionId, string>()
   let knownSector: string | null = null
   for (const id of SECTION_IDS) {
     onSection(id)
-    const text = await searchSection(provider, dossier, id, knownSector, signal)
+    const text = await searchSection(provider, dossier, id, knownSector, personal, signal)
     sections.set(id, text)
     if (id === 'sector') knownSector = text
   }

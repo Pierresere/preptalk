@@ -60,7 +60,9 @@ export async function runTurn(
   callbacks: RunTurnCallbacks
 ): Promise<Session> {
   const { dossier, session, plan, provider } = await loadContext(deps, input.dossierId, input.sessionId)
+  // No stored review means the dossier was never reviewed: refuse rather than mask nothing.
   const privacy = await deps.dossiers.readPrivacy(input.dossierId)
+  if (!privacy) throw new ProviderError('Review the privacy list first', 409)
   const turn = turnFromHistory(session.messages)
   const phase = phaseForTurn(plan, turn)
   const isDebrief = phase === null
@@ -88,7 +90,7 @@ export async function runTurn(
   for await (const delta of provider.stream({
     system,
     messages,
-    personal: personalDataOf(dossier, privacy?.names ?? []),
+    personal: personalDataOf(dossier, privacy.names),
     model: dossier.model,
     temperature: 0.85,
     signal: input.signal,

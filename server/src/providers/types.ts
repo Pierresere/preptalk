@@ -27,6 +27,7 @@ export interface StructuredInput<T> {
 
 export interface SearchInput {
   readonly query: string
+  readonly personal: PersonalData
   readonly model: string
   readonly signal: AbortSignal
 }

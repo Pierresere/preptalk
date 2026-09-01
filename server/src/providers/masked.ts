@@ -82,8 +82,8 @@ export function withMasking(provider: Provider): Provider {
     },
 
     async search(input: SearchInput): Promise<SearchResult> {
-      assertClean(input.query, NO_NAMES)
-      return provider.search(input)
+      assertClean(input.query, input.personal)
+      return provider.search({ ...input, personal: NO_NAMES })
     },
   }
 }

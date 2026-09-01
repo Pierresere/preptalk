@@ -3,6 +3,9 @@ import { parseCompany, renderCompany, researchSection, researchAll } from '../..
 import { FakeProvider } from '../../src/providers/fake.js'
 import type { Dossier } from '../../src/domain/types.js'
 import { SECTION_IDS } from '../../src/domain/sections.js'
+import type { PersonalData } from '../../src/domain/privacy.js'
+
+const personal: PersonalData = { names: [], keep: ['Acme Corp', 'Engineer'] }
 
 const dossier: Dossier = {
   id: 'acme',
@@ -34,7 +37,7 @@ describe('researchSection', () => {
     const provider = new FakeProvider({ search: { text: 'Ropes.', sources: ['https://a'] } })
     const current = renderCompany(new Map([['sector', 'Textile.']]), 'fr')
 
-    const result = await researchSection(provider, dossier, 'products', current)
+    const result = await researchSection(provider, dossier, 'products', current, personal)
 
     expect(result).toContain('## Produits et services')
     expect(result).toContain('Ropes.')
@@ -45,7 +48,7 @@ describe('researchSection', () => {
 
   it('stores the not-found sentence when the search text is blank', async () => {
     const provider = new FakeProvider({ search: { text: '   ', sources: [] } })
-    const result = await researchSection(provider, dossier, 'sector', '')
+    const result = await researchSection(provider, dossier, 'sector', '', personal)
     expect(result).toContain('Non trouvé — à vérifier.')
   })
 })
@@ -55,7 +58,7 @@ describe('researchAll', () => {
     const provider = new FakeProvider({ search: { text: 'Some text.', sources: [] } })
     const seen: string[] = []
 
-    const result = await researchAll(provider, dossier, (id) => seen.push(id))
+    const result = await researchAll(provider, dossier, (id) => seen.push(id), personal)
 
     expect(seen).toEqual([...SECTION_IDS])
     for (const id of SECTION_IDS) {

@@ -95,6 +95,7 @@ describe('session routes', () => {
   it('streams a turn as SSE with stage, chunk, and done events', async () => {
     const dossier = await createDossier()
     await dossiers.writeJson(dossier.id, 'plan', minimalPlan)
+    await dossiers.writePrivacy(dossier.id, { names: [], reviewedAt: '2026-01-01T00:00:00.000Z' })
     const created = await (
       await app.request(`/api/dossiers/${dossier.id}/sessions`, { method: 'POST' })
     ).json()

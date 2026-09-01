@@ -75,7 +75,11 @@ export function PrepareScreen({ id, onInterview }: PrepareScreenProps) {
     )
   }
   if (reviewed === null || !bundle) return null
-  if (!reviewed) return <PrivacyReview id={id} onConfirmed={() => setReviewed(true)} />
+  // The review only makes sense once there is text to review: on a fresh dossier the offer
+  // and the resume are pasted inside this very screen, so gating on entry would confirm an
+  // empty list. The `prepare.privacy` button keeps the screen reachable at any time.
+  const hasSource = bundle.offer.trim() !== '' || bundle.resume.trim() !== ''
+  if (!reviewed && hasSource) return <PrivacyReview id={id} onConfirmed={() => setReviewed(true)} />
 
   const doneCount = STEPS.filter((step) => stepDone(bundle, step)).length
   const ready = doneCount === STEPS.length

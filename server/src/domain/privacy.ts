@@ -86,6 +86,32 @@ function overlaps(span: Span, taken: readonly Span[]): boolean {
   return taken.some((t) => span.start < t.end && t.start < span.end)
 }
 
+const MIN_PART_LENGTH = 3
+
+/**
+ * Expands each confirmed name into the full value plus every whitespace-separated
+ * part of 3 characters or more, all carrying the original kind. A surname written
+ * on its own in the resume body must be masked too.
+ */
+function expandNames(names: readonly ConfirmedName[]): ConfirmedName[] {
+  const seen = new Set<string>()
+  const expanded: ConfirmedName[] = []
+  const add = (value: string, kind: NameKind): void => {
+    const trimmed = value.trim()
+    const key = `${kind}:${fold(trimmed.toLowerCase())}`
+    if (trimmed === '' || seen.has(key)) return
+    seen.add(key)
+    expanded.push({ value: trimmed, kind })
+  }
+  for (const name of names) {
+    add(name.value, name.kind)
+    for (const part of name.value.split(/\s+/)) {
+      if (part.length >= MIN_PART_LENGTH) add(part, name.kind)
+    }
+  }
+  return expanded
+}
+
 function collect(text: string, personal: PersonalData): Span[] {
   const protectedSpans = keepSpans(text, personal.keep)
   const taken: Span[] = []
@@ -97,7 +123,7 @@ function collect(text: string, personal: PersonalData): Span[] {
     }
   }
   // Longest names first so "Pierre Séré" wins over "Séré".
-  const names = [...personal.names].sort((a, b) => b.value.length - a.value.length)
+  const names = expandNames(personal.names).sort((a, b) => b.value.length - a.value.length)
   for (const name of names) {
     if (name.value.trim() === '') continue
     for (const m of text.matchAll(nameRegex(name.value))) {
