@@ -58,12 +58,25 @@ export function DossierForm({ providers, onSubmit, onCancel }: DossierFormProps)
   }
 
   return (
-    <form className="panel" onSubmit={handleSubmit}>
+    <form className="panel form-card" onSubmit={handleSubmit}>
+      <h2>{t('form.title')}</h2>
+      <p className="form-hint">{t('form.intro')}</p>
+
       <label htmlFor="dossier-company">{t('form.company')}</label>
-      <input id="dossier-company" value={company} onChange={(e) => setCompany(e.target.value)} />
+      <input
+        id="dossier-company"
+        placeholder={t('form.companyHint')}
+        value={company}
+        onChange={(e) => setCompany(e.target.value)}
+      />
 
       <label htmlFor="dossier-position">{t('form.position')}</label>
-      <input id="dossier-position" value={position} onChange={(e) => setPosition(e.target.value)} />
+      <input
+        id="dossier-position"
+        placeholder={t('form.positionHint')}
+        value={position}
+        onChange={(e) => setPosition(e.target.value)}
+      />
 
       <label htmlFor="dossier-sites">{t('form.sites')}</label>
       <textarea
@@ -73,29 +86,33 @@ export function DossierForm({ providers, onSubmit, onCancel }: DossierFormProps)
         onChange={(e) => setSites(e.target.value)}
       />
 
-      <label htmlFor="dossier-language">{t('form.language')}</label>
-      <select id="dossier-language" value={language} onChange={(e) => setLanguage(e.target.value as Language)}>
-        <option value="fr">FR</option>
-        <option value="en">EN</option>
-      </select>
+      <details className="form-advanced">
+        <summary>{t('form.advanced')}</summary>
 
-      <label htmlFor="dossier-provider">{t('form.provider')}</label>
-      <select id="dossier-provider" value={provider} onChange={(e) => handleProviderChange(e.target.value)}>
-        {providers.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.id}
-          </option>
-        ))}
-      </select>
+        <label htmlFor="dossier-language">{t('form.language')}</label>
+        <select id="dossier-language" value={language} onChange={(e) => setLanguage(e.target.value as Language)}>
+          <option value="fr">FR</option>
+          <option value="en">EN</option>
+        </select>
 
-      <label htmlFor="dossier-model">{t('form.model')}</label>
-      <select id="dossier-model" value={model} onChange={(e) => setModel(e.target.value)}>
-        {(currentProvider?.models ?? []).map((m) => (
-          <option key={m} value={m}>
-            {m}
-          </option>
-        ))}
-      </select>
+        <label htmlFor="dossier-provider">{t('form.provider')}</label>
+        <select id="dossier-provider" value={provider} onChange={(e) => handleProviderChange(e.target.value)}>
+          {providers.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.id}
+            </option>
+          ))}
+        </select>
+
+        <label htmlFor="dossier-model">{t('form.model')}</label>
+        <select id="dossier-model" value={model} onChange={(e) => setModel(e.target.value)}>
+          {(currentProvider?.models ?? []).map((m) => (
+            <option key={m} value={m}>
+              {m}
+            </option>
+          ))}
+        </select>
+      </details>
 
       <div style={{ display: 'flex', gap: 'var(--gap)', marginTop: 'var(--gap)' }}>
         <button type="submit" className="btn btn-primary" disabled={!canSubmit}>

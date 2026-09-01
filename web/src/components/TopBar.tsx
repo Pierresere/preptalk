@@ -15,21 +15,25 @@ export function TopBar({ screen, dossierId, onNavigate }: TopBarProps) {
   const t = useT()
   return (
     <div className="topbar">
-      <strong>{t('app.name')}</strong>
-      <nav style={{ display: 'flex', gap: 'var(--gap)', marginLeft: 'var(--gap)' }}>
-        {NAV_SCREENS.map((name) => (
-          <button
-            key={name}
-            type="button"
-            className={screen.name === name ? 'btn btn-primary' : 'btn'}
-            disabled={name !== 'dossiers' && dossierId === null}
-            onClick={() => onNavigate(name)}
-          >
-            {t(`nav.${name}`)}
-          </button>
-        ))}
-      </nav>
-      <div style={{ marginLeft: 'auto', display: 'flex', gap: 'var(--gap)' }}>
+      <button type="button" className="topbar-brand" onClick={() => onNavigate('home')}>
+        {t('app.name')}
+      </button>
+      {screen.name !== 'home' && (
+        <nav className="topbar-nav">
+          {NAV_SCREENS.map((name) => (
+            <button
+              key={name}
+              type="button"
+              className={screen.name === name ? 'btn btn-primary' : 'btn'}
+              disabled={name !== 'dossiers' && dossierId === null}
+              onClick={() => onNavigate(name)}
+            >
+              {t(`nav.${name}`)}
+            </button>
+          ))}
+        </nav>
+      )}
+      <div className="topbar-actions">
         <ThemeSwitch />
         <LangSwitch />
       </div>

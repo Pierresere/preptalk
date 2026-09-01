@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { I18nProvider } from './i18n'
 import { TopBar } from './components/TopBar.js'
+import { HomeScreen } from './components/HomeScreen'
 import { DossierList } from './components/DossierList'
 import { DossierForm } from './components/DossierForm'
 import { useDossiers } from './hooks/useDossiers'
@@ -9,6 +10,24 @@ import { InterviewScreen } from './components/InterviewScreen'
 import { DebriefScreen } from './components/DebriefScreen.js'
 import type { CreateDossierInput } from './services/api.js'
 import type { Screen } from './screens.js'
+
+const AUDIENCE_KEY = 'preptalk.audience'
+
+function readStoredAudience(): 'candidate' | null {
+  try {
+    return localStorage.getItem(AUDIENCE_KEY) === 'candidate' ? 'candidate' : null
+  } catch {
+    return null
+  }
+}
+
+function storeAudience(): void {
+  try {
+    localStorage.setItem(AUDIENCE_KEY, 'candidate')
+  } catch {
+    /* ignore: persistence is best-effort */
+  }
+}
 
 function DossiersScreen({ onOpen }: { onOpen: (id: string) => void }) {
   const { dossiers, providers, create, remove } = useDossiers()
@@ -32,7 +51,7 @@ function DossiersScreen({ onOpen }: { onOpen: (id: string) => void }) {
 }
 
 function Content({ screen, onInterview }: { screen: Screen; onInterview: () => void }) {
-  if (screen.name === 'dossiers') {
+  if (screen.name === 'home' || screen.name === 'dossiers') {
     return null
   }
   if (screen.name === 'prepare') {
@@ -53,12 +72,14 @@ export function App() {
 }
 
 function AppShell() {
-  const [screen, setScreen] = useState<Screen>({ name: 'dossiers' })
-  const dossierId = screen.name === 'dossiers' ? null : screen.id
+  const [screen, setScreen] = useState<Screen>(() =>
+    readStoredAudience() === 'candidate' ? { name: 'dossiers' } : { name: 'home' }
+  )
+  const dossierId = screen.name === 'home' || screen.name === 'dossiers' ? null : screen.id
 
   const navigate = (name: Screen['name']) => {
-    if (name === 'dossiers') {
-      setScreen({ name: 'dossiers' })
+    if (name === 'home' || name === 'dossiers') {
+      setScreen(name === 'home' ? { name: 'home' } : { name: 'dossiers' })
       return
     }
     if (dossierId !== null) {
@@ -66,11 +87,18 @@ function AppShell() {
     }
   }
 
+  const enterCandidate = () => {
+    storeAudience()
+    setScreen({ name: 'dossiers' })
+  }
+
   return (
     <>
       <TopBar screen={screen} dossierId={dossierId} onNavigate={navigate} />
       <div className="screen">
-        {screen.name === 'dossiers' ? (
+        {screen.name === 'home' ? (
+          <HomeScreen onCandidate={enterCandidate} />
+        ) : screen.name === 'dossiers' ? (
           <DossiersScreen onOpen={(id) => setScreen({ name: 'prepare', id })} />
         ) : (
           <Content screen={screen} onInterview={() => navigate('interview')} />

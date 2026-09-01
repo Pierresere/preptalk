@@ -1,1 +1,4 @@
-export type Screen = { name: 'dossiers' } | { name: 'prepare' | 'interview' | 'debrief'; id: string }
+export type Screen =
+  | { name: 'home' }
+  | { name: 'dossiers' }
+  | { name: 'prepare' | 'interview' | 'debrief'; id: string }
