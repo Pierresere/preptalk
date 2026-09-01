@@ -75,6 +75,7 @@ describe('generatePlan', () => {
       resume,
       company,
       analysis: null,
+      personal: { names: [], keep: [] },
       signal: new AbortController().signal,
     })
 
@@ -102,6 +103,7 @@ describe('generatePlan', () => {
       resume,
       company,
       analysis: null,
+      personal: { names: [], keep: [] },
       signal: new AbortController().signal,
     })
 
@@ -123,6 +125,7 @@ describe('generatePlan', () => {
         resume,
         company,
         analysis: null,
+        personal: { names: [], keep: [] },
         signal: new AbortController().signal,
       })
     ).rejects.toMatchObject(new ProviderError('Plan draft missing phase questions', 502))

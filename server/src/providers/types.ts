@@ -1,5 +1,6 @@
 import type { z } from 'zod'
 import type { ProviderId } from '../domain/types.js'
+import type { PersonalData } from '../domain/privacy.js'
 
 export interface ChatMessage {
   readonly role: 'user' | 'assistant'
@@ -9,6 +10,7 @@ export interface ChatMessage {
 export interface StreamInput {
   readonly system: string
   readonly messages: readonly ChatMessage[]
+  readonly personal: PersonalData
   readonly model: string
   readonly temperature: number
   readonly signal: AbortSignal
@@ -17,6 +19,7 @@ export interface StreamInput {
 export interface StructuredInput<T> {
   readonly system: string
   readonly prompt: string
+  readonly personal: PersonalData
   readonly schema: z.ZodType<T>
   readonly model: string
   readonly signal: AbortSignal

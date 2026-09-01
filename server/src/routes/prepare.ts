@@ -3,6 +3,7 @@ import type { AppDeps } from '../app.js'
 import { ProviderError, keyNameFor } from '../providers/types.js'
 import type { ProviderId } from '../domain/types.js'
 import { AnalysisSchema } from '../domain/types.js'
+import { personalDataOf } from '../domain/privacy.js'
 import { SECTION_IDS, type SectionId } from '../domain/sections.js'
 import { researchAll, researchSection } from '../pipeline/research.js'
 import { analyze } from '../pipeline/analysis.js'
@@ -54,6 +55,7 @@ export function createPrepareRoute(deps: Pick<AppDeps, 'dossiers' | 'providers'>
       offer,
       resume,
       language: dossier.language,
+      personal: personalDataOf(dossier, []),
       signal: c.req.raw.signal,
     })
     await store.writeJson(id, 'analysis', analysis)
@@ -78,6 +80,7 @@ export function createPrepareRoute(deps: Pick<AppDeps, 'dossiers' | 'providers'>
       resume,
       company,
       analysis,
+      personal: personalDataOf(dossier, []),
       signal: c.req.raw.signal,
     })
     await store.writeJson(id, 'plan', plan)

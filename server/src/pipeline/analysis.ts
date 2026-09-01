@@ -1,5 +1,6 @@
 import type { Analysis, Language } from '../domain/types.js'
 import { AnalysisSchema } from '../domain/types.js'
+import type { PersonalData } from '../domain/privacy.js'
 import type { Provider } from '../providers/types.js'
 import { ProviderError } from '../providers/types.js'
 
@@ -29,17 +30,19 @@ export interface AnalyzeInput {
   readonly offer: string
   readonly resume: string
   readonly language: Language
+  readonly personal: PersonalData
   readonly signal: AbortSignal
 }
 
 export async function analyze(input: AnalyzeInput): Promise<Analysis> {
-  const { provider, model, offer, resume, language, signal } = input
+  const { provider, model, offer, resume, language, personal, signal } = input
   if (offer.trim().length < MIN_LENGTH || resume.trim().length < MIN_LENGTH) {
     throw new ProviderError('Offer or resume is empty or too short (min 50 characters)', 400)
   }
   return provider.structured({
     system: systemPrompt(language),
     prompt: buildPrompt(offer, resume),
+    personal,
     schema: AnalysisSchema,
     model,
     signal,

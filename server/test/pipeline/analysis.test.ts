@@ -31,6 +31,7 @@ describe('analyze', () => {
         offer: 'too short',
         resume,
         language: 'en',
+        personal: { names: [], keep: [] },
         signal: new AbortController().signal,
       })
     ).rejects.toMatchObject(new ProviderError('Offer or resume is empty or too short (min 50 characters)', 400))
@@ -47,6 +48,7 @@ describe('analyze', () => {
         offer,
         resume: 'too short',
         language: 'en',
+        personal: { names: [], keep: [] },
         signal: new AbortController().signal,
       })
     ).rejects.toMatchObject(new ProviderError('Offer or resume is empty or too short (min 50 characters)', 400))
@@ -62,6 +64,7 @@ describe('analyze', () => {
       offer,
       resume,
       language: 'en',
+      personal: { names: [], keep: [] },
       signal: new AbortController().signal,
     })
 

@@ -1,5 +1,6 @@
 import { turnFromHistory, phaseForTurn } from '../domain/phases.js'
 import { buildInterviewSystem } from '../domain/prompt.js'
+import { personalDataOf } from '../domain/privacy.js'
 import { selectChunks } from '../domain/retrieval.js'
 import { AnalysisSchema, PlanSchema, type Session } from '../domain/types.js'
 import { ProviderError, keyNameFor } from '../providers/types.js'
@@ -86,6 +87,7 @@ export async function runTurn(
   for await (const delta of provider.stream({
     system,
     messages,
+    personal: personalDataOf(dossier, []),
     model: dossier.model,
     temperature: 0.85,
     signal: input.signal,

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import type { Analysis, Dossier, Plan } from '../domain/types.js'
 import { PersonaSchema, PlanSchema } from '../domain/types.js'
+import type { PersonalData } from '../domain/privacy.js'
 import type { Provider } from '../providers/types.js'
 import { ProviderError } from '../providers/types.js'
 import { LANGUAGE_SWITCH, SKELETON, type SkeletonPhase } from '../domain/skeleton.js'
@@ -87,15 +88,17 @@ export interface GeneratePlanInput {
   readonly resume: string
   readonly company: string
   readonly analysis: Analysis | null
+  readonly personal: PersonalData
   readonly signal: AbortSignal
 }
 
 export async function generatePlan(input: GeneratePlanInput): Promise<Plan> {
-  const { provider, model, dossier, offer, resume, company, analysis, signal } = input
+  const { provider, model, dossier, offer, resume, company, analysis, personal, signal } = input
   const phases = phaseList(offer)
   const draft = await provider.structured({
     system: systemPrompt(dossier.language),
     prompt: buildPrompt(phases, offer, resume, company, analysis),
+    personal,
     schema: PlanDraftSchema,
     model,
     signal,
