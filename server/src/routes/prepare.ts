@@ -1,13 +1,21 @@
-import { Hono } from 'hono'
+import { Hono, type Context } from 'hono'
+import { z } from 'zod'
 import type { AppDeps } from '../app.js'
 import { ProviderError, keyNameFor } from '../providers/types.js'
 import type { ProviderId } from '../domain/types.js'
-import { AnalysisSchema } from '../domain/types.js'
-import { personalDataOf } from '../domain/privacy.js'
+import { AnalysisSchema, ConfirmedNameSchema } from '../domain/types.js'
+import { personalDataOf, detect } from '../domain/privacy.js'
+import { suggestNames } from '../domain/suggest.js'
 import { SECTION_IDS, type SectionId } from '../domain/sections.js'
 import { researchAll, researchSection } from '../pipeline/research.js'
 import { analyze } from '../pipeline/analysis.js'
 import { generatePlan } from '../pipeline/plan.js'
+
+const PrivacyBodySchema = z.object({ names: z.array(ConfirmedNameSchema) })
+
+function badRequest(c: Context, issue: z.ZodError): Response {
+  return c.json({ error: issue.flatten() }, 400)
+}
 
 function isSectionId(value: string): value is SectionId {
   return (SECTION_IDS as readonly string[]).includes(value)
@@ -55,7 +63,7 @@ export function createPrepareRoute(deps: Pick<AppDeps, 'dossiers' | 'providers'>
       offer,
       resume,
       language: dossier.language,
-      personal: personalDataOf(dossier, []),
+      personal: personalDataOf(dossier, (await store.readPrivacy(id))?.names ?? []),
       signal: c.req.raw.signal,
     })
     await store.writeJson(id, 'analysis', analysis)
@@ -80,11 +88,39 @@ export function createPrepareRoute(deps: Pick<AppDeps, 'dossiers' | 'providers'>
       resume,
       company,
       analysis,
-      personal: personalDataOf(dossier, []),
+      personal: personalDataOf(dossier, (await store.readPrivacy(id))?.names ?? []),
       signal: c.req.raw.signal,
     })
     await store.writeJson(id, 'plan', plan)
     return c.json(plan)
+  })
+
+  app.get('/api/dossiers/:id/privacy', async (c) => {
+    const id = c.req.param('id')
+    const dossier = await store.read(id)
+    const [resume, offer, confirmed] = await Promise.all([
+      store.readText(id, 'resume'),
+      store.readText(id, 'offer'),
+      store.readPrivacy(id),
+    ])
+    const keep = [dossier.company, dossier.position]
+    const suggested = suggestNames(resume, offer, keep)
+    const personal = personalDataOf(dossier, confirmed?.names ?? suggested)
+    return c.json({
+      suggested,
+      detected: detect(`${resume}\n${offer}`, personal),
+      confirmed: confirmed?.names ?? null,
+    })
+  })
+
+  app.put('/api/dossiers/:id/privacy', async (c) => {
+    const id = c.req.param('id')
+    await store.read(id)
+    const parsed = PrivacyBodySchema.safeParse(await c.req.json())
+    if (!parsed.success) return badRequest(c, parsed.error)
+    const privacy = { names: parsed.data.names, reviewedAt: new Date().toISOString() }
+    await store.writePrivacy(id, privacy)
+    return c.json(privacy)
   })
 
   return app

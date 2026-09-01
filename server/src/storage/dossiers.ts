@@ -1,8 +1,8 @@
 import fs from 'node:fs/promises'
 import { z } from 'zod'
-import { Dossier, DossierSchema } from '../domain/types.js'
+import { Dossier, DossierSchema, Privacy, PrivacySchema } from '../domain/types.js'
 import { NotFoundError, InvalidNameError } from './errors.js'
-import { readJsonFile } from './json.js'
+import { readJsonFile, writeJsonFile } from './json.js'
 import {
   dossierDir,
   dossierJsonPath,
@@ -128,6 +128,14 @@ export class DossierStore {
 
   async writeJson<T>(id: string, name: 'analysis' | 'plan', value: T): Promise<void> {
     await fs.writeFile(jsonPath(this.dataDir, id, name), JSON.stringify(value, null, 2), 'utf-8')
+  }
+
+  async readPrivacy(id: string): Promise<Privacy | null> {
+    return readJsonFile(jsonPath(this.dataDir, id, 'privacy'), PrivacySchema)
+  }
+
+  async writePrivacy(id: string, privacy: Privacy): Promise<void> {
+    await writeJsonFile(jsonPath(this.dataDir, id, 'privacy'), privacy)
   }
 
   async listDocuments(id: string): Promise<{ name: string; chars: number }[]> {

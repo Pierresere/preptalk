@@ -118,4 +118,14 @@ describe('DossierStore', () => {
     await store.removeDocument(created.id, 'notes.md')
     expect(await store.listDocuments(created.id)).toEqual([])
   })
+
+  test('round-trips the privacy list', async () => {
+    const created = await store.create(input)
+    expect(await store.readPrivacy(created.id)).toBeNull()
+    await store.writePrivacy(created.id, {
+      names: [{ value: 'Pierre Séré', kind: 'candidate' }],
+      reviewedAt: '2026-08-31T00:00:00.000Z',
+    })
+    expect((await store.readPrivacy(created.id))?.names).toEqual([{ value: 'Pierre Séré', kind: 'candidate' }])
+  })
 })

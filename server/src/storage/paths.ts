@@ -30,7 +30,7 @@ export function textPath(dataDir: string, id: string, name: 'offer' | 'resume' |
   return path.join(dossierDir(dataDir, id), `${name}.md`)
 }
 
-export function jsonPath(dataDir: string, id: string, name: 'analysis' | 'plan'): string {
+export function jsonPath(dataDir: string, id: string, name: 'analysis' | 'plan' | 'privacy'): string {
   return path.join(dossierDir(dataDir, id), `${name}.json`)
 }
 

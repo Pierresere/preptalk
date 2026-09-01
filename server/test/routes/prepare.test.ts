@@ -154,3 +154,30 @@ describe('POST /api/dossiers/:id/company/research', () => {
     expect(body.company).toContain('## Competitors')
   })
 })
+
+describe('privacy routes', () => {
+  it('suggests names then stores the confirmed list', async () => {
+    const created = await (
+      await app.request('/api/dossiers', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(createBody),
+      })
+    ).json()
+    await store.writeText(created.id, 'resume', 'Pierre Séré\nCoordonnateur qualité\n')
+
+    const get = await app.request(`/api/dossiers/${created.id}/privacy`)
+    expect(get.status).toBe(200)
+    const body = (await get.json()) as { suggested: { value: string }[]; confirmed: unknown }
+    expect(body.suggested).toContainEqual({ value: 'Pierre Séré', kind: 'candidate' })
+    expect(body.confirmed).toBeNull()
+
+    const put = await app.request(`/api/dossiers/${created.id}/privacy`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ names: [{ value: 'Pierre Séré', kind: 'candidate' }] }),
+    })
+    expect(put.status).toBe(200)
+    expect((await store.readPrivacy(created.id))?.names).toHaveLength(1)
+  })
+})

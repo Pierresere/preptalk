@@ -18,6 +18,16 @@ export const DossierSchema = z.object({
 })
 export type Dossier = z.infer<typeof DossierSchema>
 
+export const ConfirmedNameSchema = z.object({
+  value: z.string().min(1),
+  kind: z.enum(['candidate', 'person']),
+})
+export const PrivacySchema = z.object({
+  names: z.array(ConfirmedNameSchema),
+  reviewedAt: z.string(),
+})
+export type Privacy = z.infer<typeof PrivacySchema>
+
 export const PersonaSchema = z.object({
   name: z.string(), role: z.string(), concerns: z.string(), tone: z.string(),
 })
